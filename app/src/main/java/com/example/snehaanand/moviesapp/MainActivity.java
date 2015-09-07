@@ -1,33 +1,29 @@
 package com.example.snehaanand.moviesapp;
 
 import android.os.AsyncTask;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
 import android.widget.GridView;
-import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.squareup.picasso.Picasso;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
     private static final String DEBUG_TAG = "MainActivity";
-    private static final String URL="http://api.themoviedb.org/3/discover/movie?sort_by=popularity.desc&api_key=a9b7cc3f0852ce9d2f83d7ae160fce44";
+    private static final String URL = "http://api.themoviedb.org/3/discover/movie?sort_by=popularity.desc&api_key=a9b7cc3f0852ce9d2f83d7ae160fce44";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,12 +54,13 @@ public class MainActivity extends AppCompatActivity {
                 return "Unable to retrieve web page. URL may be invalid.";
             }
         }
+
         //TODO:display progress status in post execute
-        // @Override
+        @Override
         protected void onPostExecute(String result) {
-           // textView.setText(result);
-            Toast.makeText(MainActivity.this,"server data"+result,Toast.LENGTH_LONG).show();
+            Toast.makeText(MainActivity.this, "server data:" + result, Toast.LENGTH_LONG).show();
         }
+
         private String downloadUrl(String myurl) throws IOException {
             InputStream is = null;
 
@@ -88,11 +85,7 @@ public class MainActivity extends AppCompatActivity {
                     result += line;
                 }
 
-                // Close stream
-                if (null != is) {
-                    is.close();
-                }
-                return result;
+                return parseResult(result).toString();
 
                 // Makes sure that the InputStream is closed after the app is
                 // finished using it.
@@ -103,8 +96,17 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-          // private void parseResult(S){}
+        private JSONArray parseResult(String jsonElements) {
+            try {
+                JSONObject response = new JSONObject(jsonElements);
+                JSONArray results = response.optJSONArray("results");
 
+                return results;
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
 
 
     }
@@ -115,7 +117,6 @@ public class MainActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
-
 
 
     @Override
