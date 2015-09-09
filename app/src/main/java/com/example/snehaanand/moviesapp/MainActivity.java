@@ -20,6 +20,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import com.google.gson.Gson;
 
 public class MainActivity extends AppCompatActivity {
     private static final String DEBUG_TAG = "MainActivity";
@@ -58,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
         //TODO:display progress status in post execute
         @Override
         protected void onPostExecute(String result) {
-            Toast.makeText(MainActivity.this, "server data:" + result, Toast.LENGTH_LONG).show();
+           // Toast.makeText(MainActivity.this, "server data:" + result, Toast.LENGTH_LONG).show();
         }
 
         private String downloadUrl(String myurl) throws IOException {
@@ -100,7 +101,12 @@ public class MainActivity extends AppCompatActivity {
             try {
                 JSONObject response = new JSONObject(jsonElements);
                 JSONArray results = response.optJSONArray("results");
+                for(int i=0;i<results.length();i++){
+                    //http://stackoverflow.com/questions/1688099/converting-json-to-java
+                MovieClass movieClass=new Gson().fromJson(results., MovieClass.class);
+                    Toast.makeText(MainActivity.this, "server data:" + movieClass.getOriginal_title(), Toast.LENGTH_LONG).show();
 
+                }
                 return results;
             } catch (JSONException e) {
                 e.printStackTrace();
