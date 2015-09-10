@@ -20,7 +20,13 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
+
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 public class MainActivity extends AppCompatActivity {
     private static final String DEBUG_TAG = "MainActivity";
@@ -44,25 +50,27 @@ public class MainActivity extends AppCompatActivity {
 //        });
     }
 
-    private class DownloadWebpageTask extends AsyncTask<String, Void, String> {
+    private class DownloadWebpageTask extends AsyncTask<String, Void, List> {
+        private List<String> movieImages=new ArrayList<>();
         @Override
-        protected String doInBackground(String... urls) {
+        protected List doInBackground(String... urls) {
 
             // params comes from the execute() call: params[0] is the url.
             try {
                 return downloadUrl(urls[0]);
             } catch (IOException e) {
-                return "Unable to retrieve web page. URL may be invalid.";
+               e.printStackTrace();
             }
+            return null;
         }
 
         //TODO:display progress status in post execute
         @Override
-        protected void onPostExecute(String result) {
-           // Toast.makeText(MainActivity.this, "server data:" + result, Toast.LENGTH_LONG).show();
+        protected void onPostExecute(List result) {
+            Toast.makeText(MainActivity.this, "server data:" + result.size(), Toast.LENGTH_LONG).show();
         }
 
-        private String downloadUrl(String myurl) throws IOException {
+        private List downloadUrl(String myurl) throws IOException {
             InputStream is = null;
 
             try {
@@ -86,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
                     result += line;
                 }
 
-                return parseResult(result).toString();
+                return parseResult(result);
 
                 // Makes sure that the InputStream is closed after the app is
                 // finished using it.
@@ -97,24 +105,17 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        private JSONArray parseResult(String jsonElements) {
-            try {
-                JSONObject response = new JSONObject(jsonElements);
-                JSONArray results = response.optJSONArray("results");
-                for(int i=0;i<results.length();i++){
-                    //http://stackoverflow.com/questions/1688099/converting-json-to-java
-                MovieClass movieClass=new Gson().fromJson(results., MovieClass.class);
-                    Toast.makeText(MainActivity.this, "server data:" + movieClass.getOriginal_title(), Toast.LENGTH_LONG).show();
-
-                }
-                return results;
-            } catch (JSONException e) {
-                e.printStackTrace();
+        private List parseResult(String jsonElements) {
+            JsonElement jsonElement = new JsonParser().parse(jsonElements);
+            JsonObject jsonObject = jsonElement.getAsJsonObject();
+            JsonArray jsonArray = jsonObject.getAsJsonArray("results");
+            for(int i=0;i<jsonArray.size();i++)
+            {
+                MovieClass data = new Gson().fromJson(jsonArray.get(i), MovieClass.class);
+                movieImages.add(data.getPoster_path());
             }
-            return null;
+            return movieImages;
         }
-
-
     }
 
     @Override
@@ -140,11 +141,4 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public class FetchWeatherTask extends AsyncTask<String, Void, ArrayList> {
-
-        @Override
-        protected ArrayList doInBackground(String... params) {
-            return null;
-        }
-    }
 }
