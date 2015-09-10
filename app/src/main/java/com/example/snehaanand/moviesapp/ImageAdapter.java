@@ -1,6 +1,7 @@
 package com.example.snehaanand.moviesapp;
 
 import android.content.Context;
+import android.net.Uri;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -8,20 +9,22 @@ import android.widget.GridView;
 import android.widget.ImageView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by snehaanandyeluguri on 9/6/15.
  */
 public class ImageAdapter extends BaseAdapter{
     private Context mContext;
-    //private ArrayList mThumbIds=new ArrayList();
+    private List mThumbIds=new ArrayList();
 
-    public ImageAdapter(Context c) {
+    public ImageAdapter(Context c,List<String> movieImages) {
         mContext = c;
+        mThumbIds=movieImages;
    }
 
     public int getCount() {
-        return mThumbIds.length;
+        return mThumbIds.size();
     }
 
     public Object getItem(int position) {
@@ -44,14 +47,8 @@ public class ImageAdapter extends BaseAdapter{
         } else {
             imageView = (ImageView) convertView;
         }
-        imageView.setImageResource(mThumbIds[position]);// mThumbIds.get(position)
+        imageView.setImageURI(Uri.parse(mThumbIds.get(position).toString()));// mThumbIds.get(position)
         return imageView;
     }
-    // references to our images
-    private Integer[] mThumbIds = {
-            R.mipmap.ic_launcher, R.mipmap.ic_launcher,
-            R.mipmap.ic_launcher, R.mipmap.ic_launcher
-    };
-
 
 }

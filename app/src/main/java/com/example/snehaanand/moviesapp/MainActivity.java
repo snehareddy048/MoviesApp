@@ -21,6 +21,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -38,8 +39,16 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         GridView gridview = (GridView) findViewById(R.id.gridView);
         //TODO:get images from server,parse and send back the response as image uris
-        new DownloadWebpageTask().execute(URL);
-// gridview.setAdapter(new ImageAdapter(this));
+
+        try {
+            List<String> movieImages=new DownloadWebpageTask().execute(URL).get();
+            gridview.setAdapter(new ImageAdapter(this,movieImages ));
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+
 
 //  gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 //            public void onItemClick(AdapterView<?> parent, View v,
@@ -54,12 +63,11 @@ public class MainActivity extends AppCompatActivity {
         private List<String> movieImages=new ArrayList<>();
         @Override
         protected List doInBackground(String... urls) {
-
             // params comes from the execute() call: params[0] is the url.
             try {
                 return downloadUrl(urls[0]);
             } catch (IOException e) {
-               e.printStackTrace();
+               e.printStackTrace();//TODO:show errror to user
             }
             return null;
         }
@@ -93,9 +101,7 @@ public class MainActivity extends AppCompatActivity {
                 while ((line = bufferedReader.readLine()) != null) {
                     result += line;
                 }
-
                 return parseResult(result);
-
                 // Makes sure that the InputStream is closed after the app is
                 // finished using it.
             } finally {
@@ -112,7 +118,7 @@ public class MainActivity extends AppCompatActivity {
             for(int i=0;i<jsonArray.size();i++)
             {
                 MovieClass data = new Gson().fromJson(jsonArray.get(i), MovieClass.class);
-                movieImages.add(data.getPoster_path());
+                movieImages.add("http://image.tmdb.org/t/p/w185/"+data.getPoster_path());
             }
             return movieImages;
         }
