@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.GridView;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.w3c.dom.Text;
@@ -16,8 +17,17 @@ public class DetailsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_details);
         TextView movieName = (TextView) findViewById(R.id.movieName);
-        String message = getIntent().getStringExtra(MainActivity.MOVIE_DETAILS);
-        movieName.setText(message);
+        TextView userRating = (TextView) findViewById(R.id.userRating);
+        TextView releaseDate = (TextView) findViewById(R.id.releaseDate);
+        TextView synopsis = (TextView) findViewById(R.id.synopsis);
+        ImageView movieImage = (ImageView) findViewById(R.id.movieImage);
+
+        MovieClass movieDetails = getIntent().getParcelableExtra(MainActivity.MOVIE_DETAILS);
+        movieName.setText(movieDetails.getOriginal_title());
+        userRating.setText(movieDetails.getVote_average().toString());
+        releaseDate.setText(movieDetails.getRelease_date());
+        synopsis.setText(movieDetails.getOverview());
+        movieImage.setImageBitmap(movieDetails.getDisplay_image());
 
     }
 

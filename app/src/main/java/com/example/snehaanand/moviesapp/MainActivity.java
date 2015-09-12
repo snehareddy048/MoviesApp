@@ -33,7 +33,7 @@ import com.google.gson.JsonParser;
 
 public class MainActivity extends AppCompatActivity {
     private static final String DEBUG_TAG = "MainActivity";
-    private static final String URL = "http://api.themoviedb.org/3/discover/movie?sort_by=popularity.desc&api_key=a9b7cc3f0852ce9d2f83d7ae160fce44";
+    private static final String URL = "http://api.themoviedb.org/3/discover/movie?sort_by=popularity.desc&api_key=[Your API Key]";
     List<MovieClass> movieDetails = new ArrayList<>();
     public static final String MOVIE_DETAILS="MOVIE_DETAILS";
 
@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View v,
                                     int position, long id) {
                 Intent intent = new Intent(MainActivity.this, DetailsActivity.class);
-                intent.putExtra(MOVIE_DETAILS,"hii" );
+                intent.putExtra(MOVIE_DETAILS,movieDetails.get(position));
                 startActivity(intent);
             }
         });

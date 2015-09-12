@@ -1,13 +1,15 @@
 package com.example.snehaanand.moviesapp;
 
 import android.graphics.Bitmap;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import java.util.Date;
 
 /**
  * Created by ajr617 on 9/9/15.
  */
-public class MovieClass {
+public class MovieClass implements Parcelable{
 
     private String original_title;
 
@@ -70,4 +72,38 @@ public class MovieClass {
     }
 
 
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    private MovieClass(Parcel in) {
+        original_title = in.readString();
+        poster_path=in.readString();
+        overview=in.readString();
+        release_date=in.readString();
+        vote_average=in.readFloat();
+        display_image=in.readParcelable(Bitmap.class.getClassLoader());
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(original_title);
+        dest.writeString(poster_path);
+        dest.writeString(overview);
+        dest.writeString(release_date);
+        dest.writeFloat(vote_average);
+        dest.writeParcelable(display_image,flags);
+    }
+
+    public static final Parcelable.Creator<MovieClass> CREATOR
+            = new Parcelable.Creator<MovieClass>() {
+        public MovieClass createFromParcel(Parcel in) {
+            return new MovieClass(in);
+        }
+
+        public MovieClass[] newArray(int size) {
+            return new MovieClass[size];
+        }
+    };
 }
