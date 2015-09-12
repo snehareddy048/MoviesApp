@@ -1,11 +1,15 @@
 package com.example.snehaanand.moviesapp;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.Toast;
 
@@ -18,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,42 +37,40 @@ import com.google.gson.JsonParser;
 public class MainActivity extends AppCompatActivity {
     private static final String DEBUG_TAG = "MainActivity";
     private static final String URL = "http://api.themoviedb.org/3/discover/movie?sort_by=popularity.desc&api_key=a9b7cc3f0852ce9d2f83d7ae160fce44";
+    List<Bitmap> movieBitmaps = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         GridView gridview = (GridView) findViewById(R.id.gridView);
-        //TODO:get images from server,parse and send back the response as image uris
 
         try {
-            List<String> movieImages=new DownloadWebpageTask().execute(URL).get();
-            gridview.setAdapter(new ImageAdapter(this,movieImages ));
+            List<Bitmap> movieBitmaps = new DownloadWebpageTask().execute(URL).get();
+            gridview.setAdapter(new ImageAdapter(this, movieBitmaps));
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {
             e.printStackTrace();
         }
-
-
-//  gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//            public void onItemClick(AdapterView<?> parent, View v,
-//                                    int position, long id) {
-//                Toast.makeText(MainActivity.this, "" + position,
-//                        Toast.LENGTH_SHORT).show();
-//            }
-//        });
+        gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            public void onItemClick(AdapterView<?> parent, View v,
+                                    int position, long id) {
+                Toast.makeText(MainActivity.this, "" + position,
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private class DownloadWebpageTask extends AsyncTask<String, Void, List> {
-        private List<String> movieImages=new ArrayList<>();
+
         @Override
-        protected List doInBackground(String... urls) {
+        protected List<Bitmap> doInBackground(String... urls) {
             // params comes from the execute() call: params[0] is the url.
             try {
                 return downloadUrl(urls[0]);
             } catch (IOException e) {
-               e.printStackTrace();//TODO:show errror to user
+                e.printStackTrace();//TODO:show error to user
             }
             return null;
         }
@@ -78,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(MainActivity.this, "server data:" + result.size(), Toast.LENGTH_LONG).show();
         }
 
-        private List downloadUrl(String myurl) throws IOException {
+        private List<Bitmap> downloadUrl(String myurl) throws IOException {
             InputStream is = null;
 
             try {
@@ -111,16 +114,24 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        private List parseResult(String jsonElements) {
+        private List<Bitmap> parseResult(String jsonElements) {
             JsonElement jsonElement = new JsonParser().parse(jsonElements);
             JsonObject jsonObject = jsonElement.getAsJsonObject();
             JsonArray jsonArray = jsonObject.getAsJsonArray("results");
-            for(int i=0;i<jsonArray.size();i++)
-            {
+            for (int i = 0; i < jsonArray.size(); i++) {
                 MovieClass data = new Gson().fromJson(jsonArray.get(i), MovieClass.class);
-                movieImages.add("http://image.tmdb.org/t/p/w185/"+data.getPoster_path());
+                try {
+                    URL url = new URL("http://image.tmdb.org/t/p/w185/" + data.getPoster_path());
+                    movieBitmaps.add(BitmapFactory.decodeStream(url.openConnection().getInputStream()));
+
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
             }
-            return movieImages;
+            return movieBitmaps;
         }
     }
 

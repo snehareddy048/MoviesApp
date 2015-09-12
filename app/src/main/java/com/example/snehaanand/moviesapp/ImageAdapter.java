@@ -1,6 +1,7 @@
 package com.example.snehaanand.moviesapp;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,11 +17,11 @@ import java.util.List;
  */
 public class ImageAdapter extends BaseAdapter{
     private Context mContext;
-    private List mThumbIds=new ArrayList();
+    private List<Bitmap> mThumbIds=new ArrayList();
 
-    public ImageAdapter(Context c,List<String> movieImages) {
+    public ImageAdapter(Context c,List<Bitmap> movieBitmaps) {
         mContext = c;
-        mThumbIds=movieImages;
+        mThumbIds=movieBitmaps;
    }
 
     public int getCount() {
@@ -47,7 +48,7 @@ public class ImageAdapter extends BaseAdapter{
         } else {
             imageView = (ImageView) convertView;
         }
-        imageView.setImageURI(Uri.parse(mThumbIds.get(position).toString()));// mThumbIds.get(position)
+        imageView.setImageBitmap(mThumbIds.get(position));// mThumbIds.get(position)
         return imageView;
     }
 
