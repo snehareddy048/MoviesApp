@@ -1,5 +1,7 @@
 package com.example.snehaanand.moviesapp;
 
+import android.graphics.Bitmap;
+
 import java.util.Date;
 
 /**
@@ -16,6 +18,9 @@ public class MovieClass {
     private String release_date;
 
     private Float vote_average;
+
+    //bitmap to be displayed
+    private Bitmap display_image;
 
     public String getOriginal_title() {
         return original_title;
@@ -56,5 +61,13 @@ public class MovieClass {
     public void setVote_average(Float vote_average) {
         this.vote_average = vote_average;
     }
+    public Bitmap getDisplay_image() {
+        return display_image;
+    }
+
+    public void setDisplay_image(Bitmap display_image) {
+        this.display_image = display_image;
+    }
+
 
 }

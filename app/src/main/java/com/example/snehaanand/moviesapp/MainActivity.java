@@ -1,5 +1,6 @@
 package com.example.snehaanand.moviesapp;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
@@ -12,10 +13,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.Toast;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -37,7 +34,8 @@ import com.google.gson.JsonParser;
 public class MainActivity extends AppCompatActivity {
     private static final String DEBUG_TAG = "MainActivity";
     private static final String URL = "http://api.themoviedb.org/3/discover/movie?sort_by=popularity.desc&api_key=a9b7cc3f0852ce9d2f83d7ae160fce44";
-    List<Bitmap> movieBitmaps = new ArrayList<>();
+    List<MovieClass> movieDetails = new ArrayList<>();
+    public static final String MOVIE_DETAILS="MOVIE_DETAILS";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,8 +44,8 @@ public class MainActivity extends AppCompatActivity {
         GridView gridview = (GridView) findViewById(R.id.gridView);
 
         try {
-            List<Bitmap> movieBitmaps = new DownloadWebpageTask().execute(URL).get();
-            gridview.setAdapter(new ImageAdapter(this, movieBitmaps));
+            movieDetails = new DownloadWebpageTask().execute(URL).get();
+            gridview.setAdapter(new ImageAdapter(this, movieDetails));
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {
@@ -56,8 +54,9 @@ public class MainActivity extends AppCompatActivity {
         gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v,
                                     int position, long id) {
-                Toast.makeText(MainActivity.this, "" + position,
-                        Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(MainActivity.this, DetailsActivity.class);
+                intent.putExtra(MOVIE_DETAILS,"hii" );
+                startActivity(intent);
             }
         });
     }
@@ -65,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
     private class DownloadWebpageTask extends AsyncTask<String, Void, List> {
 
         @Override
-        protected List<Bitmap> doInBackground(String... urls) {
+        protected List<MovieClass> doInBackground(String... urls) {
             // params comes from the execute() call: params[0] is the url.
             try {
                 return downloadUrl(urls[0]);
@@ -81,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(MainActivity.this, "server data:" + result.size(), Toast.LENGTH_LONG).show();
         }
 
-        private List<Bitmap> downloadUrl(String myurl) throws IOException {
+        private List<MovieClass> downloadUrl(String myurl) throws IOException {
             InputStream is = null;
 
             try {
@@ -114,15 +113,18 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        private List<Bitmap> parseResult(String jsonElements) {
+        private List<MovieClass> parseResult(String jsonElements) {
             JsonElement jsonElement = new JsonParser().parse(jsonElements);
             JsonObject jsonObject = jsonElement.getAsJsonObject();
             JsonArray jsonArray = jsonObject.getAsJsonArray("results");
             for (int i = 0; i < jsonArray.size(); i++) {
                 MovieClass data = new Gson().fromJson(jsonArray.get(i), MovieClass.class);
+                //movieImages.add("http://image.tmdb.org/t/p/w185/"+data.getPoster_path());
                 try {
                     URL url = new URL("http://image.tmdb.org/t/p/w185/" + data.getPoster_path());
-                    movieBitmaps.add(BitmapFactory.decodeStream(url.openConnection().getInputStream()));
+                    data.setDisplay_image(BitmapFactory.decodeStream(url.openConnection().getInputStream()));
+                    movieDetails.add(data);
+                    //movieDetails.add();
 
                 } catch (MalformedURLException e) {
                     e.printStackTrace();
@@ -131,7 +133,7 @@ public class MainActivity extends AppCompatActivity {
                 }
 
             }
-            return movieBitmaps;
+            return movieDetails;
         }
     }
 

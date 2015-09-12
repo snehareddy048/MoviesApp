@@ -17,9 +17,9 @@ import java.util.List;
  */
 public class ImageAdapter extends BaseAdapter{
     private Context mContext;
-    private List<Bitmap> mThumbIds=new ArrayList();
+    private List<MovieClass> mThumbIds=new ArrayList();
 
-    public ImageAdapter(Context c,List<Bitmap> movieBitmaps) {
+    public ImageAdapter(Context c,List<MovieClass> movieBitmaps) {
         mContext = c;
         mThumbIds=movieBitmaps;
    }
@@ -48,7 +48,7 @@ public class ImageAdapter extends BaseAdapter{
         } else {
             imageView = (ImageView) convertView;
         }
-        imageView.setImageBitmap(mThumbIds.get(position));// mThumbIds.get(position)
+        imageView.setImageBitmap(mThumbIds.get(position).getDisplay_image());// mThumbIds.get(position)
         return imageView;
     }
 
