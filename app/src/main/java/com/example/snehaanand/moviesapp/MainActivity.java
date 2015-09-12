@@ -1,7 +1,6 @@
 package com.example.snehaanand.moviesapp;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -12,7 +11,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
-import android.widget.Toast;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -25,17 +29,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-
 public class MainActivity extends AppCompatActivity {
     private static final String DEBUG_TAG = "MainActivity";
-    private static final String URL = "http://api.themoviedb.org/3/discover/movie?sort_by=popularity.desc&api_key=[Your API Key]";
+    private static final String URL = "http://api.themoviedb.org/3/discover/movie?sort_by=popularity.desc&api_key=a9b7cc3f0852ce9d2f83d7ae160fce44";
     List<MovieClass> movieDetails = new ArrayList<>();
-    public static final String MOVIE_DETAILS="MOVIE_DETAILS";
+    public static final String MOVIE_DETAILS = "MOVIE_DETAILS";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View v,
                                     int position, long id) {
                 Intent intent = new Intent(MainActivity.this, DetailsActivity.class);
-                intent.putExtra(MOVIE_DETAILS,movieDetails.get(position));
+                intent.putExtra(MOVIE_DETAILS, movieDetails.get(position));
                 startActivity(intent);
             }
         });
@@ -72,12 +70,6 @@ public class MainActivity extends AppCompatActivity {
                 e.printStackTrace();//TODO:show error to user
             }
             return null;
-        }
-
-        //TODO:display progress status in post execute
-        @Override
-        protected void onPostExecute(List result) {
-            Toast.makeText(MainActivity.this, "server data:" + result.size(), Toast.LENGTH_LONG).show();
         }
 
         private List<MovieClass> downloadUrl(String myurl) throws IOException {
@@ -143,7 +135,6 @@ public class MainActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
-
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

@@ -4,12 +4,10 @@ import android.graphics.Bitmap;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import java.util.Date;
-
 /**
  * Created by ajr617 on 9/9/15.
  */
-public class MovieClass implements Parcelable{
+public class MovieClass implements Parcelable {
 
     private String original_title;
 
@@ -63,6 +61,7 @@ public class MovieClass implements Parcelable{
     public void setVote_average(Float vote_average) {
         this.vote_average = vote_average;
     }
+
     public Bitmap getDisplay_image() {
         return display_image;
     }
@@ -79,11 +78,11 @@ public class MovieClass implements Parcelable{
 
     private MovieClass(Parcel in) {
         original_title = in.readString();
-        poster_path=in.readString();
-        overview=in.readString();
-        release_date=in.readString();
-        vote_average=in.readFloat();
-        display_image=in.readParcelable(Bitmap.class.getClassLoader());
+        poster_path = in.readString();
+        overview = in.readString();
+        release_date = in.readString();
+        vote_average = in.readFloat();
+        display_image = in.readParcelable(Bitmap.class.getClassLoader());
     }
 
     @Override
@@ -93,7 +92,7 @@ public class MovieClass implements Parcelable{
         dest.writeString(overview);
         dest.writeString(release_date);
         dest.writeFloat(vote_average);
-        dest.writeParcelable(display_image,flags);
+        dest.writeParcelable(display_image, flags);
     }
 
     public static final Parcelable.Creator<MovieClass> CREATOR

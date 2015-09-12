@@ -1,8 +1,6 @@
 package com.example.snehaanand.moviesapp;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.net.Uri;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -15,17 +13,17 @@ import java.util.List;
 /**
  * Created by snehaanandyeluguri on 9/6/15.
  */
-public class ImageAdapter extends BaseAdapter{
-    private Context mContext;
-    private List<MovieClass> mThumbIds=new ArrayList();
+public class ImageAdapter extends BaseAdapter {
+    private Context context;
+    private List<MovieClass> thumbIds = new ArrayList();
 
-    public ImageAdapter(Context c,List<MovieClass> movieBitmaps) {
-        mContext = c;
-        mThumbIds=movieBitmaps;
-   }
+    public ImageAdapter(Context c, List<MovieClass> movieBitmaps) {
+        context = c;
+        thumbIds = movieBitmaps;
+    }
 
     public int getCount() {
-        return mThumbIds.size();
+        return thumbIds.size();
     }
 
     public Object getItem(int position) {
@@ -41,14 +39,14 @@ public class ImageAdapter extends BaseAdapter{
         ImageView imageView;
         if (convertView == null) {
             // if it's not recycled, initialize some attributes
-            imageView = new ImageView(mContext);
+            imageView = new ImageView(context);
             imageView.setLayoutParams(new GridView.LayoutParams(85, 85));
             imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
             imageView.setPadding(8, 8, 8, 8);
         } else {
             imageView = (ImageView) convertView;
         }
-        imageView.setImageBitmap(mThumbIds.get(position).getDisplay_image());// mThumbIds.get(position)
+        imageView.setImageBitmap(thumbIds.get(position).getDisplay_image());
         return imageView;
     }
 
