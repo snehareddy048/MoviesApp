@@ -1,5 +1,6 @@
 package com.example.snehaanand.moviesapp;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
@@ -31,7 +32,6 @@ import java.util.concurrent.ExecutionException;
 
 public class MainActivity extends AppCompatActivity {
     private static final String DEBUG_TAG = "MainActivity";
-    private static final String URL = "http://api.themoviedb.org/3/discover/movie?sort_by=popularity.desc&api_key=a9b7cc3f0852ce9d2f83d7ae160fce44";
     List<MovieClass> movieDetails = new ArrayList<>();
     public static final String MOVIE_DETAILS = "MOVIE_DETAILS";
 
@@ -40,6 +40,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         GridView gridview = (GridView) findViewById(R.id.gridView);
+        final String[] options = getResources().getStringArray(R.array.pref_sort_values);
+        String URL = "http://api.themoviedb.org/3/discover/movie?sort_by="+options[1]+".desc&api_key=[YOUR API KEY]";
 
         try {
             movieDetails = new DownloadWebpageTask().execute(URL).get();
@@ -145,6 +147,7 @@ public class MainActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            startActivity(new Intent(this,SettingsActivity.class));
             return true;
         }
 
