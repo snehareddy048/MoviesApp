@@ -1,5 +1,6 @@
 package com.example.snehaanand.moviesapp;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
@@ -52,6 +53,8 @@ public class SettingsActivity extends PreferenceActivity
             int prefIndex = listPreference.findIndexOfValue(stringValue);
             if (prefIndex >= 0) {
                 preference.setSummary(listPreference.getEntries()[prefIndex]);
+//                Intent intent = new Intent(SettingsActivity.this, MainActivity.class);
+//                startActivity(intent);
             }
         } else {
             // For other preferences, set the summary to the value's simple string representation.
@@ -59,5 +62,7 @@ public class SettingsActivity extends PreferenceActivity
         }
         return true;
     }
+
+
 
 }
