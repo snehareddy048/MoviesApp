@@ -53,8 +53,6 @@ public class SettingsActivity extends PreferenceActivity
             int prefIndex = listPreference.findIndexOfValue(stringValue);
             if (prefIndex >= 0) {
                 preference.setSummary(listPreference.getEntries()[prefIndex]);
-//                Intent intent = new Intent(SettingsActivity.this, MainActivity.class);
-//                startActivity(intent);
             }
         } else {
             // For other preferences, set the summary to the value's simple string representation.
@@ -63,6 +61,10 @@ public class SettingsActivity extends PreferenceActivity
         return true;
     }
 
-
+    @Override
+    public void onBackPressed(){
+        Intent intent = new Intent(SettingsActivity.this, MainActivity.class);
+        startActivity(intent);
+    }
 
 }

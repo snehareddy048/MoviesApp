@@ -2,9 +2,11 @@ package com.example.snehaanand.moviesapp;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -12,6 +14,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -35,13 +38,18 @@ public class MainActivity extends AppCompatActivity {
     List<MovieClass> movieDetails = new ArrayList<>();
     public static final String MOVIE_DETAILS = "MOVIE_DETAILS";
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         GridView gridview = (GridView) findViewById(R.id.gridView);
-        final String[] options = getResources().getStringArray(R.array.pref_sort_values);
-        String URL = "http://api.themoviedb.org/3/discover/movie?sort_by="+options[1]+".desc&api_key=[YOUR API KEY]";
+        SharedPreferences sharedPrefs =
+                PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        String sortType = sharedPrefs.getString(
+                getString(R.string.pref_sort_key), "");
+
+        String URL = "http://api.themoviedb.org/3/discover/movie?sort_by="+sortType+".desc&api_key=[YOUR API KEY]";
 
         try {
             movieDetails = new DownloadWebpageTask().execute(URL).get();
@@ -55,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View v,
                                     int position, long id) {
                 Intent intent = new Intent(MainActivity.this, DetailsActivity.class);
-                intent.putExtra(MOVIE_DETAILS,movieDetails.get(position));
+                intent.putExtra(MOVIE_DETAILS, movieDetails.get(position));
                 startActivity(intent);
             }
         });
