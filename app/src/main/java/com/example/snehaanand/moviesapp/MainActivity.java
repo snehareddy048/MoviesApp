@@ -1,6 +1,5 @@
 package com.example.snehaanand.moviesapp;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.BitmapFactory;
@@ -34,10 +33,10 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 public class MainActivity extends AppCompatActivity {
-    private static final String DEBUG_TAG = "MainActivity";
     List<MovieClass> movieDetails = new ArrayList<>();
     public static final String MOVIE_DETAILS = "MOVIE_DETAILS";
-
+    public static final String RESULTS = "results";
+    public static final String URL_GET = "get";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,17 +46,24 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences sharedPrefs =
                 PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         String sortType = sharedPrefs.getString(
-                getString(R.string.pref_sort_key), "");
+                getString(R.string.pref_sort_key), "popularity");
 
-        String URL = "http://api.themoviedb.org/3/discover/movie?sort_by="+sortType+".desc&api_key=[YOUR API KEY]";
+        String MOVIE_DB_URL = "http://api.themoviedb.org/3/discover/movie?sort_by="+sortType+".desc&api_key=[YOUR API KEY]";
 
         try {
-            movieDetails = new DownloadWebpageTask().execute(URL).get();
-            gridview.setAdapter(new ImageAdapter(this, movieDetails));
+            new URL(MOVIE_DB_URL);
+            movieDetails = new DownloadWebpageTask().execute(MOVIE_DB_URL).get();
+            if (movieDetails != null) {
+                gridview.setAdapter(new ImageAdapter(this, movieDetails));
+            } else {
+                Toast.makeText(getBaseContext(), R.string.no_internet_api, Toast.LENGTH_LONG).show();
+            }
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {
             e.printStackTrace();
+        } catch (MalformedURLException e) {
+            Toast.makeText(getBaseContext(), R.string.invalid_api, Toast.LENGTH_LONG).show();
         }
         gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v,
@@ -73,11 +79,10 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected List<MovieClass> doInBackground(String... urls) {
-            // params comes from the execute() call: params[0] is the url.
             try {
                 return downloadUrl(urls[0]);
             } catch (IOException e) {
-                e.printStackTrace();//TODO:show error to user
+                e.printStackTrace();
             }
             return null;
         }
@@ -90,12 +95,11 @@ public class MainActivity extends AppCompatActivity {
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setReadTimeout(10000 /* milliseconds */);
                 conn.setConnectTimeout(15000 /* milliseconds */);
-                conn.setRequestMethod("GET");
+                conn.setRequestMethod(URL_GET);
                 conn.setDoInput(true);
                 // Starts the query
                 conn.connect();
                 int response = conn.getResponseCode();
-                Log.d(DEBUG_TAG, "The response is: " + response);
                 is = conn.getInputStream();
 
                 // Convert the InputStream into a string
@@ -118,16 +122,14 @@ public class MainActivity extends AppCompatActivity {
         private List<MovieClass> parseResult(String jsonElements) {
             JsonElement jsonElement = new JsonParser().parse(jsonElements);
             JsonObject jsonObject = jsonElement.getAsJsonObject();
-            JsonArray jsonArray = jsonObject.getAsJsonArray("results");
+            JsonArray jsonArray = jsonObject.getAsJsonArray(RESULTS);
             for (int i = 0; i < jsonArray.size(); i++) {
                 MovieClass data = new Gson().fromJson(jsonArray.get(i), MovieClass.class);
-                //movieImages.add("http://image.tmdb.org/t/p/w185/"+data.getPoster_path());
-                try {
+                try
+                {
                     URL url = new URL("http://image.tmdb.org/t/p/w185/" + data.getPoster_path());
                     data.setDisplay_image(BitmapFactory.decodeStream(url.openConnection().getInputStream()));
                     movieDetails.add(data);
-                    //movieDetails.add();
-
                 } catch (MalformedURLException e) {
                     e.printStackTrace();
                 } catch (IOException e) {
@@ -155,7 +157,7 @@ public class MainActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            startActivity(new Intent(this,SettingsActivity.class));
+            startActivity(new Intent(this, SettingsActivity.class));
             return true;
         }
 

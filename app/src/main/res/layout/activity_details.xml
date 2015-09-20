@@ -14,11 +14,11 @@
         android:layout_width="wrap_content"
         android:layout_height="100dp"
         android:src="@mipmap/ic_launcher"
-        android:layout_marginLeft="75dp"
-        android:layout_marginStart="75dp"
-        android:layout_above="@+id/releaseDate"
+        android:layout_below="@+id/movieName"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:layout_marginLeft="79dp"
+        android:layout_marginStart="79dp" />
 
     <TextView
         android:id="@+id/movieName"
@@ -27,9 +27,12 @@
         android:text="@string/movie_name"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:layout_alignRight="@id/movieImage"
-        android:layout_alignParentTop="true"
         android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:background="@color/background_color"/>
 
     <TextView
         android:id="@+id/synopsis"
@@ -42,17 +45,17 @@
         android:layout_alignRight="@+id/movieName"
         android:text="@string/synopsis"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:layout_below="@+id/userRating" />
+        android:layout_below="@+id/movieImage" />
 
     <TextView
         android:id="@+id/releaseDate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/movieName"
-        android:layout_alignStart="@+id/movieName"
-        android:layout_below="@+id/movieName"
         android:text="@string/release_date"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:layout_below="@+id/movieName"
+        android:layout_alignRight="@+id/movieName"
+        android:layout_alignEnd="@+id/movieName" />
 
     <TextView
         android:id="@+id/userRating"

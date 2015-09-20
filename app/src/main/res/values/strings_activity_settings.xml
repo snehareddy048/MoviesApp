@@ -3,7 +3,6 @@
 
     <!-- Strings related to Settings -->
 
-    <!-- Example General settings -->
     <string name="pref_header_general">General</string>
     <string name="pref_sort_label">Sort by</string>
     <string name="pref_sort_key">Order</string>
