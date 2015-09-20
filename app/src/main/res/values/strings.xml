@@ -3,7 +3,7 @@
 
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
-    <string name="no_of_columns">3</string>
+    <string name="no_of_columns">2</string>
     <string name="movie_name">Movie name</string>
     <string name="synopsis">Plot synopsis</string>
     <string name="user_rating">User rating</string>

@@ -7,7 +7,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -36,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
     List<MovieClass> movieDetails = new ArrayList<>();
     public static final String MOVIE_DETAILS = "MOVIE_DETAILS";
     public static final String RESULTS = "results";
-    public static final String URL_GET = "get";
+    public static final String URL_GET = "GET";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,8 +47,7 @@ public class MainActivity extends AppCompatActivity {
         String sortType = sharedPrefs.getString(
                 getString(R.string.pref_sort_key), "popularity");
 
-        String MOVIE_DB_URL = "http://api.themoviedb.org/3/discover/movie?sort_by="+sortType+".desc&api_key=[YOUR API KEY]";
-
+        String MOVIE_DB_URL = "http://api.themoviedb.org/3/discover/movie?sort_by=" + sortType + ".desc&api_key=[YOUR API KEY]";
         try {
             new URL(MOVIE_DB_URL);
             movieDetails = new DownloadWebpageTask().execute(MOVIE_DB_URL).get();
@@ -125,8 +123,7 @@ public class MainActivity extends AppCompatActivity {
             JsonArray jsonArray = jsonObject.getAsJsonArray(RESULTS);
             for (int i = 0; i < jsonArray.size(); i++) {
                 MovieClass data = new Gson().fromJson(jsonArray.get(i), MovieClass.class);
-                try
-                {
+                try {
                     URL url = new URL("http://image.tmdb.org/t/p/w185/" + data.getPoster_path());
                     data.setDisplay_image(BitmapFactory.decodeStream(url.openConnection().getInputStream()));
                     movieDetails.add(data);
