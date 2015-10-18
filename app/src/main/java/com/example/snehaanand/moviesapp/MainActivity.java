@@ -27,7 +27,6 @@ import java.util.concurrent.ExecutionException;
 
 public class MainActivity extends AppCompatActivity {
     List<MovieClass> movieDetails = new ArrayList<>();
-    public static final String MOVIE_DETAILS = "MOVIE_DETAILS";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View v,
                                     int position, long id) {
                 Intent intent = new Intent(MainActivity.this, DetailsActivity.class);
-                intent.putExtra(MOVIE_DETAILS, movieDetails.get(position));
+                intent.putExtra(Utils.MOVIE_DETAILS, movieDetails.get(position));
                 startActivity(intent);
             }
         });
