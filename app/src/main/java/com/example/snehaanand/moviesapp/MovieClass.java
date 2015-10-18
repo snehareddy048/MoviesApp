@@ -9,6 +9,8 @@ import android.os.Parcelable;
  */
 public class MovieClass implements Parcelable {
 
+    private Integer id;
+
     private String original_title;
 
     private String poster_path;
@@ -21,6 +23,14 @@ public class MovieClass implements Parcelable {
 
     //bitmap to be displayed
     private Bitmap display_image;
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
     public String getOriginal_title() {
         return original_title;
@@ -77,6 +87,7 @@ public class MovieClass implements Parcelable {
     }
 
     private MovieClass(Parcel in) {
+        id=in.readInt();
         original_title = in.readString();
         poster_path = in.readString();
         overview = in.readString();
@@ -87,6 +98,7 @@ public class MovieClass implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(id);
         dest.writeString(original_title);
         dest.writeString(poster_path);
         dest.writeString(overview);

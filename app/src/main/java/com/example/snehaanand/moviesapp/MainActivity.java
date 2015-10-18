@@ -3,6 +3,7 @@ package com.example.snehaanand.moviesapp;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -16,15 +17,8 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -34,8 +28,6 @@ import java.util.concurrent.ExecutionException;
 public class MainActivity extends AppCompatActivity {
     List<MovieClass> movieDetails = new ArrayList<>();
     public static final String MOVIE_DETAILS = "MOVIE_DETAILS";
-    public static final String RESULTS = "results";
-    public static final String URL_GET = "GET";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,11 +38,13 @@ public class MainActivity extends AppCompatActivity {
                 PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         String sortType = sharedPrefs.getString(
                 getString(R.string.pref_sort_key), "popularity");
+        Uri builtUri = Uri.parse(Utils.BASE_URL).buildUpon().appendPath("discover").appendPath(Utils.PATH_MOVIE).appendQueryParameter("sort_by", sortType + ".desc")
+                .appendQueryParameter(Utils.QUERY_PARAMETER_API, Utils.API_KEY).build();
+        String MOVIE_DB_URL=builtUri.toString();
 
-        String MOVIE_DB_URL = "http://api.themoviedb.org/3/discover/movie?sort_by=" + sortType + ".desc&api_key=[YOUR API KEY]";
         try {
-            new URL(MOVIE_DB_URL);
-            movieDetails = new DownloadWebpageTask().execute(MOVIE_DB_URL).get();
+            JsonArray jsonArray = new DownloadWebPageTask().execute(MOVIE_DB_URL).get();
+            movieDetails=new GetImageTask().execute(jsonArray).get();
             if (movieDetails != null) {
                 gridview.setAdapter(new ImageAdapter(this, movieDetails));
             } else {
@@ -60,8 +54,6 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         } catch (ExecutionException e) {
             e.printStackTrace();
-        } catch (MalformedURLException e) {
-            Toast.makeText(getBaseContext(), R.string.invalid_api, Toast.LENGTH_LONG).show();
         }
         gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v,
@@ -73,54 +65,13 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private class DownloadWebpageTask extends AsyncTask<String, Void, List> {
-
+    private class GetImageTask extends AsyncTask<JsonArray, Void, List> {
         @Override
-        protected List<MovieClass> doInBackground(String... urls) {
-            try {
-                return downloadUrl(urls[0]);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return null;
+        protected List<MovieClass> doInBackground(JsonArray... jsonArray) {
+            return parseResult(jsonArray[0]);
         }
 
-        private List<MovieClass> downloadUrl(String myurl) throws IOException {
-            InputStream is = null;
-
-            try {
-                URL url = new URL(myurl);
-                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                conn.setReadTimeout(10000 /* milliseconds */);
-                conn.setConnectTimeout(15000 /* milliseconds */);
-                conn.setRequestMethod(URL_GET);
-                conn.setDoInput(true);
-                // Starts the query
-                conn.connect();
-                int response = conn.getResponseCode();
-                is = conn.getInputStream();
-
-                // Convert the InputStream into a string
-                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(is));
-                String line;
-                String result = "";
-                while ((line = bufferedReader.readLine()) != null) {
-                    result += line;
-                }
-                return parseResult(result);
-                // Makes sure that the InputStream is closed after the app is
-                // finished using it.
-            } finally {
-                if (is != null) {
-                    is.close();
-                }
-            }
-        }
-
-        private List<MovieClass> parseResult(String jsonElements) {
-            JsonElement jsonElement = new JsonParser().parse(jsonElements);
-            JsonObject jsonObject = jsonElement.getAsJsonObject();
-            JsonArray jsonArray = jsonObject.getAsJsonArray(RESULTS);
+        private List<MovieClass> parseResult(JsonArray jsonArray) {
             for (int i = 0; i < jsonArray.size(); i++) {
                 MovieClass data = new Gson().fromJson(jsonArray.get(i), MovieClass.class);
                 try {
