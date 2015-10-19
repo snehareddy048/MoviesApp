@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
                 PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         String sortType = sharedPrefs.getString(
                 getString(R.string.pref_sort_key), "popularity");
-        Uri builtUri = Uri.parse(Utils.BASE_URL).buildUpon().appendPath("discover").appendPath(Utils.PATH_MOVIE).appendQueryParameter("sort_by", sortType + ".desc")
+        Uri builtUri = Uri.parse(Utils.MOVIEDB_BASE_URL).buildUpon().appendPath("discover").appendPath(Utils.PATH_MOVIE).appendQueryParameter("sort_by", sortType + ".desc")
                 .appendQueryParameter(Utils.QUERY_PARAMETER_API, Utils.API_KEY).build();
         String MOVIE_DB_URL=builtUri.toString();
 
