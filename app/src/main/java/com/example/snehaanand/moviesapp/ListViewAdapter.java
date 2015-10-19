@@ -10,13 +10,15 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+
 public class ListViewAdapter extends BaseAdapter
 {
     Activity context;
-    String author[];
-    String content[];
+    ArrayList<String> author;
+    ArrayList<String> content;
 
-    public ListViewAdapter(Activity context, String[] author, String[] content) {
+    public ListViewAdapter(Activity context, ArrayList<String> author, ArrayList<String> content) {
         super();
         this.context = context;
         this.author = author;
@@ -25,7 +27,7 @@ public class ListViewAdapter extends BaseAdapter
 
     public int getCount() {
         // TODO Auto-generated method stub
-        return author.length;
+        return author.size();
     }
 
     public Object getItem(int position) {
@@ -63,8 +65,8 @@ public class ListViewAdapter extends BaseAdapter
             holder = (ViewHolder) convertView.getTag();
         }
 
-        holder.txtViewAuthor.setText(author[position]);
-        holder.txtViewContent.setText(content[position]);
+        holder.txtViewAuthor.setText(author.get(position));
+        holder.txtViewContent.setText(content.get(position));
 
         return convertView;
     }

@@ -1,4 +1,4 @@
-package com.example.snehaanand.moviesapp;
+package com.example.snehaanand.moviesapp.network;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;

@@ -15,6 +15,9 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.Toast;
 
+import com.example.snehaanand.moviesapp.model.MovieClass;
+import com.example.snehaanand.moviesapp.network.DownloadWebPageTask;
+import com.example.snehaanand.moviesapp.utils.Utils;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 

@@ -1,20 +1,19 @@
 package com.example.snehaanand.moviesapp;
 
-import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.example.snehaanand.moviesapp.model.MovieClass;
+import com.example.snehaanand.moviesapp.model.ReviewClass;
+import com.example.snehaanand.moviesapp.network.DownloadWebPageTask;
+import com.example.snehaanand.moviesapp.utils.Utils;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -22,6 +21,9 @@ import java.util.concurrent.ExecutionException;
 public class DetailsActivity extends AppCompatActivity {
     List<ReviewClass> reviewDetails = new ArrayList<>();
     ListViewAdapter lviewAdapter;
+    ArrayList<String> author=new ArrayList<>();
+    ArrayList<String> content=new ArrayList<>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,14 +58,12 @@ public class DetailsActivity extends AppCompatActivity {
         releaseDate.setText(movieDetails.getRelease_date());
         synopsis.setText(movieDetails.getOverview());
         movieImage.setImageBitmap(movieDetails.getDisplay_image());
-        String month[] = {"January","February","March","April","May",
-                "June","July","August","September","October","November","December"};
-
-        String number[] = {"Month - 1", "Month - 2","Month - 3",
-                "Month - 4","Month - 5","Month - 6",
-                "Month - 7","Month - 8","Month - 9",
-                "Month - 10","Month - 11","Month - 12"};
-        lviewAdapter = new ListViewAdapter(this,month,number);
+        for (ReviewClass review : reviewDetails)
+        {
+            author.add(review.getAuthor());
+            content.add(review.getContent());
+        }
+        lviewAdapter = new ListViewAdapter(this,author,content);
         userReviews.setAdapter(lviewAdapter);
 
     }

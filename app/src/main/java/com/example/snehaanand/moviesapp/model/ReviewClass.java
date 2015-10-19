@@ -1,4 +1,4 @@
-package com.example.snehaanand.moviesapp;
+package com.example.snehaanand.moviesapp.model;
 
 /**
  * Created by snehaanandyeluguri on 10/18/15.

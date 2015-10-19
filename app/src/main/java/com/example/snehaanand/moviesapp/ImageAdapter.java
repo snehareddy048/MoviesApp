@@ -4,8 +4,10 @@ import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.ListView;
+
+import com.example.snehaanand.moviesapp.model.MovieClass;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +20,11 @@ public class ImageAdapter extends BaseAdapter {
     private List<MovieClass> thumbIds = new ArrayList();
 
     public ImageAdapter(Context c, List<MovieClass> movieBitmaps) {
+        context = c;
+        thumbIds = movieBitmaps;
+    }
+
+    public ImageAdapter(Context c, List<String> list,List<MovieClass> movieBitmaps) {
         context = c;
         thumbIds = movieBitmaps;
     }

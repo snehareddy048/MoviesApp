@@ -1,4 +1,4 @@
-package com.example.snehaanand.moviesapp;
+package com.example.snehaanand.moviesapp.model;
 
 import android.graphics.Bitmap;
 import android.os.Parcel;
