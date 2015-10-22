@@ -1,8 +1,13 @@
 package com.example.snehaanand.moviesapp;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -22,9 +27,11 @@ import java.util.concurrent.ExecutionException;
 public class DetailsActivity extends AppCompatActivity {
     List<ReviewClass> reviewDetails = new ArrayList<>();
     List<TrailerClass> trailerDetails = new ArrayList<>();
-    ListViewAdapter lviewAdapter;
+    ReviewAdapter reviewAdapter;
+    TrailerAdapter trailerAdapter;
     ArrayList<String> author=new ArrayList<>();
     ArrayList<String> content=new ArrayList<>();
+    ArrayList<String> trailerName=new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +43,7 @@ public class DetailsActivity extends AppCompatActivity {
         TextView synopsis = (TextView) findViewById(R.id.synopsis);
         ImageView movieImage = (ImageView) findViewById(R.id.movieImage);
         ListView userReviews = (ListView) findViewById(R.id.userReviews);
+        ListView trailerVideos = (ListView) findViewById(R.id.trailerVideos);
 
         MovieClass movieDetails = getIntent().getParcelableExtra(Utils.MOVIE_DETAILS);
         Uri reviewUri = Uri.parse(Utils.MOVIEDB_BASE_URL).buildUpon().appendPath(Utils.PATH_MOVIE).
@@ -79,16 +87,49 @@ public class DetailsActivity extends AppCompatActivity {
         releaseDate.setText(movieDetails.getRelease_date());
         synopsis.setText(movieDetails.getOverview());
         movieImage.setImageBitmap(movieDetails.getDisplay_image());
+        //trailers
+        for (TrailerClass trailer : trailerDetails)
+        {
+            trailerName.add(trailer.getName());
+        }
+        trailerAdapter = new TrailerAdapter(this,trailerName);
+        //code to add header  to listview
+        LayoutInflater trailerInflator = getLayoutInflater();
+        ViewGroup trailerHeaderValue = (ViewGroup) trailerInflator.inflate(R.layout.header, trailerVideos,
+                false);
+        TextView headerValue = (TextView) trailerHeaderValue.findViewById(R.id.header_text);
+        headerValue.setText(this.getString(R.string.trailers));
+        trailerVideos.addHeaderView(trailerHeaderValue, null, false);
+        //code to add header  to listview
+        trailerVideos.setAdapter(trailerAdapter);
+        trailerVideos.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            public void onItemClick(AdapterView<?> parent, View v,
+                                    int position, long id) {
+                String movieId=trailerDetails.get(position-1).getKey();
+                Uri movieUri = Uri.parse(Utils.YOUTUBE_BASE_URL).buildUpon().appendQueryParameter("v", movieId).build();
+                String trailerUrl=movieUri.toString();
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(trailerUrl));
+                startActivity(intent);
+            }
+        });
+
+        //reviews
         for (ReviewClass review : reviewDetails)
         {
             author.add(review.getAuthor());
             content.add(review.getContent());
         }
-        lviewAdapter = new ListViewAdapter(this,author,content);
-        userReviews.setAdapter(lviewAdapter);
+        reviewAdapter = new ReviewAdapter(this,author,content);
+        //code to add header  to listview
+        LayoutInflater inflater = getLayoutInflater();
+        ViewGroup reviewHeader = (ViewGroup) inflater.inflate(R.layout.header, userReviews,
+                false);
+        TextView reviewHeaderValue = (TextView) reviewHeader.findViewById(R.id.header_text);
+        reviewHeaderValue.setText(this.getString(R.string.reviews));
+        userReviews.addHeaderView(reviewHeader, null, false);
+        //code to add header  to listview
 
-        TextView movieTrailer = (TextView) findViewById(R.id.trailers);
-        if(trailerDetails!=null)
-        movieTrailer.setText(trailerDetails.size()+"hii");
+        userReviews.setAdapter(reviewAdapter);
+
     }
 }

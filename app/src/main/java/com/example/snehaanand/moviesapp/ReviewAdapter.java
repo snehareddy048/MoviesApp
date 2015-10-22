@@ -12,13 +12,13 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-public class ListViewAdapter extends BaseAdapter
+public class ReviewAdapter extends BaseAdapter
 {
     Activity context;
     ArrayList<String> author;
     ArrayList<String> content;
 
-    public ListViewAdapter(Activity context, ArrayList<String> author, ArrayList<String> content) {
+    public ReviewAdapter(Activity context, ArrayList<String> author, ArrayList<String> content) {
         super();
         this.context = context;
         this.author = author;
@@ -26,17 +26,14 @@ public class ListViewAdapter extends BaseAdapter
     }
 
     public int getCount() {
-        // TODO Auto-generated method stub
         return author.size();
     }
 
     public Object getItem(int position) {
-        // TODO Auto-generated method stub
         return null;
     }
 
     public long getItemId(int position) {
-        // TODO Auto-generated method stub
         return 0;
     }
 
@@ -47,14 +44,13 @@ public class ListViewAdapter extends BaseAdapter
 
     public View getView(int position, View convertView, ViewGroup parent)
     {
-        // TODO Auto-generated method stub
         ViewHolder holder;
 
         LayoutInflater inflater =  context.getLayoutInflater();
 
         if (convertView == null)
         {
-            convertView = inflater.inflate(R.layout.list_item_row, null);
+            convertView = inflater.inflate(R.layout.list_review_row, null);
             holder = new ViewHolder();
             holder.txtViewAuthor = (TextView) convertView.findViewById(R.id.author);
             holder.txtViewContent = (TextView) convertView.findViewById(R.id.content);
