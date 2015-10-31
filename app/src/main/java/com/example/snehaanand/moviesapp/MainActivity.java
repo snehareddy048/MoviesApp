@@ -2,6 +2,7 @@ package com.example.snehaanand.moviesapp;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -40,22 +41,44 @@ public class MainActivity extends AppCompatActivity {
                 PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         String sortType = sharedPrefs.getString(
                 getString(R.string.pref_sort_key), "popularity");
-        Uri builtUri = Uri.parse(Utils.MOVIEDB_BASE_URL).buildUpon().appendPath("discover").appendPath(Utils.PATH_MOVIE).appendQueryParameter("sort_by", sortType + ".desc")
-                .appendQueryParameter(Utils.QUERY_PARAMETER_API, Utils.API_KEY).build();
-        String MOVIE_DB_URL=builtUri.toString();
 
-        try {
-            JsonArray jsonArray = new DownloadWebPageTask().execute(MOVIE_DB_URL).get();
-            movieDetails=new GetImageTask().execute(jsonArray).get();
-            if (movieDetails != null) {
-                gridview.setAdapter(new ImageAdapter(this, movieDetails));
-            } else {
-                Toast.makeText(getBaseContext(), R.string.no_internet_api, Toast.LENGTH_LONG).show();
+        if(!sortType.equalsIgnoreCase("favorite")) {
+            Uri builtUri = Uri.parse(Utils.MOVIEDB_BASE_URL).buildUpon().appendPath("discover").
+                    appendPath(Utils.PATH_MOVIE).appendQueryParameter("sort_by", sortType + ".desc")
+                    .appendQueryParameter(Utils.QUERY_PARAMETER_API, Utils.API_KEY).build();
+            String MOVIE_DB_URL = builtUri.toString();
+
+
+            try {
+                JsonArray jsonArray = new DownloadWebPageTask().execute(MOVIE_DB_URL).get();
+                movieDetails = new GetImageTask().execute(jsonArray).get();
+                if (movieDetails != null) {
+                    gridview.setAdapter(new ImageAdapter(this, movieDetails));
+                } else {
+                    Toast.makeText(getBaseContext(), R.string.no_internet_api, Toast.LENGTH_LONG).show();
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
             }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
+        }
+        else{
+            //favorite
+
+            String URL = "content://"+Utils.CONTENT_BASE_URL+"/students";
+
+            Uri students = Uri.parse(URL);
+            Cursor c = managedQuery(students, null, null, null, MoviesProvider._ID);
+
+            if (c!=null&&c.moveToFirst()) {
+                do{
+                    Toast.makeText(this,
+                            c.getString(c.getColumnIndex( MoviesProvider._ID)) ,
+                            Toast.LENGTH_SHORT).show();
+                } while (c.moveToNext());
+            }
+            //
         }
         gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v,
@@ -85,7 +108,6 @@ public class MainActivity extends AppCompatActivity {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-
             }
             return movieDetails;
         }

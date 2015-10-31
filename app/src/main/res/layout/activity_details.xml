@@ -33,27 +33,22 @@
 
             <TextView
                 android:id="@+id/movieName"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
                 android:layout_alignParentTop="true"
-                android:layout_alignRight="@id/movieImage"
                 android:background="@color/background_color"
                 android:text="@string/movie_name"
                 android:textAppearance="?android:attr/textAppearanceLarge" />
 
-            <ImageButton
+            <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/favorite"
-                android:layout_alignParentEnd="true"
+                android:layout_below="@id/movieName"
                 android:layout_alignParentRight="true"
-                android:layout_alignRight="@+id/movieName"
-                android:layout_alignBottom="@+id/movieName"
-                android:src="@drawable/star"
-                android:layout_alignParentTop="true"
-                android:layout_above="@+id/movieImage"
+                android:text="@string/mark_favorite"
                 />
 
             <TextView
@@ -88,7 +83,6 @@
         </RelativeLayout>
     </ScrollView>
 
-
     <ListView
         android:id="@+id/trailerVideos"
         android:layout_width="wrap_content"
@@ -102,6 +96,5 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/trailerVideos"
         android:layout_weight="1"/>
-
 
 </LinearLayout>

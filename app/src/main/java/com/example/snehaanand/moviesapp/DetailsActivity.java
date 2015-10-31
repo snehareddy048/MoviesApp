@@ -1,5 +1,6 @@
 package com.example.snehaanand.moviesapp;
 
+import android.content.ContentValues;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -8,9 +9,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.snehaanand.moviesapp.model.MovieClass;
 import com.example.snehaanand.moviesapp.model.ReviewClass;
@@ -44,8 +47,9 @@ public class DetailsActivity extends AppCompatActivity {
         ImageView movieImage = (ImageView) findViewById(R.id.movieImage);
         ListView userReviews = (ListView) findViewById(R.id.userReviews);
         ListView trailerVideos = (ListView) findViewById(R.id.trailerVideos);
+        Button favorite = (Button) findViewById(R.id.favorite);
 
-        MovieClass movieDetails = getIntent().getParcelableExtra(Utils.MOVIE_DETAILS);
+        final MovieClass movieDetails = getIntent().getParcelableExtra(Utils.MOVIE_DETAILS);
         Uri reviewUri = Uri.parse(Utils.MOVIEDB_BASE_URL).buildUpon().appendPath(Utils.PATH_MOVIE).
                 appendPath(movieDetails.getId().toString()).appendPath(Utils.PATH_REVIEWS)
                 .appendQueryParameter(Utils.QUERY_PARAMETER_API, Utils.API_KEY).build();
@@ -87,6 +91,18 @@ public class DetailsActivity extends AppCompatActivity {
         releaseDate.setText(movieDetails.getRelease_date());
         synopsis.setText(movieDetails.getOverview());
         movieImage.setImageBitmap(movieDetails.getDisplay_image());
+        favorite.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ContentValues values = new ContentValues();
+                values.put(MoviesProvider._ID,movieDetails.getId());
+                Uri uri = getContentResolver().insert(
+                        MoviesProvider.CONTENT_URI, values);
+                Toast.makeText(getBaseContext(),
+                        uri.toString(), Toast.LENGTH_LONG).show();
+            }
+        });
+
         //trailers
         for (TrailerClass trailer : trailerDetails)
         {
@@ -130,6 +146,5 @@ public class DetailsActivity extends AppCompatActivity {
         //code to add header  to listview
 
         userReviews.setAdapter(reviewAdapter);
-
     }
 }

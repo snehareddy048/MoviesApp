@@ -8,6 +8,7 @@ public interface Utils
     String MOVIE_DETAILS="movie_details";
     String MOVIEDB_BASE_URL ="http://api.themoviedb.org/3/";
     String YOUTUBE_BASE_URL="https://www.youtube.com/watch";
+    String CONTENT_BASE_URL="com.example.provider.College";
     String PATH_MOVIE="movie";
     String PATH_REVIEWS="reviews";
     String PATH_VIDEOS="videos";
