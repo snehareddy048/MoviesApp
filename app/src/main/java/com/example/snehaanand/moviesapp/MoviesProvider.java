@@ -48,7 +48,7 @@ public class MoviesProvider  extends ContentProvider {
     static final int DATABASE_VERSION = 1;
     static final String CREATE_DB_TABLE =
             " CREATE TABLE " + STUDENTS_TABLE_NAME +
-                    " ("+_ID+" TEXT NOT NULL UNIQUE );";
+                    " ("+_ID+" INTEGER NOT NULL UNIQUE );";
 
     /**
      * Helper class that actually creates and manages

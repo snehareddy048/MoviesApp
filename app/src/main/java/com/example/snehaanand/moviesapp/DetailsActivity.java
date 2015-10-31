@@ -2,6 +2,8 @@ package com.example.snehaanand.moviesapp;
 
 import android.content.ContentValues;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -22,6 +24,7 @@ import com.example.snehaanand.moviesapp.network.DownloadWebPageTask;
 import com.example.snehaanand.moviesapp.utils.Utils;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,7 +50,7 @@ public class DetailsActivity extends AppCompatActivity {
         ImageView movieImage = (ImageView) findViewById(R.id.movieImage);
         ListView userReviews = (ListView) findViewById(R.id.userReviews);
         ListView trailerVideos = (ListView) findViewById(R.id.trailerVideos);
-        Button favorite = (Button) findViewById(R.id.favorite);
+        final Button favorite = (Button) findViewById(R.id.favorite);
 
         final MovieClass movieDetails = getIntent().getParcelableExtra(Utils.MOVIE_DETAILS);
         Uri reviewUri = Uri.parse(Utils.MOVIEDB_BASE_URL).buildUpon().appendPath(Utils.PATH_MOVIE).
@@ -61,7 +64,8 @@ public class DetailsActivity extends AppCompatActivity {
         String GET_TRAILERS_URL=trailerUri.toString();
 
         try {
-            JsonArray jsonArray = new DownloadWebPageTask().execute(GET_REVIEWS_URL).get();
+            JsonObject jsonObject = new DownloadWebPageTask().execute(GET_REVIEWS_URL).get();
+            JsonArray jsonArray = jsonObject.getAsJsonArray(Utils.RESULTS);
             for (int i = 0; i < jsonArray.size(); i++)
             {
                 ReviewClass reviewData = new Gson().fromJson(jsonArray.get(i), ReviewClass.class);
@@ -74,7 +78,8 @@ public class DetailsActivity extends AppCompatActivity {
         }
 
         try {
-            JsonArray jsonArray = new DownloadWebPageTask().execute(GET_TRAILERS_URL).get();
+            JsonObject jsonObject = new DownloadWebPageTask().execute(GET_TRAILERS_URL).get();
+            JsonArray jsonArray = jsonObject.getAsJsonArray(Utils.RESULTS);
             for (int i = 0; i < jsonArray.size(); i++)
             {
                 TrailerClass trailerData = new Gson().fromJson(jsonArray.get(i), TrailerClass.class);
@@ -91,17 +96,26 @@ public class DetailsActivity extends AppCompatActivity {
         releaseDate.setText(movieDetails.getRelease_date());
         synopsis.setText(movieDetails.getOverview());
         movieImage.setImageBitmap(movieDetails.getDisplay_image());
-        favorite.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ContentValues values = new ContentValues();
-                values.put(MoviesProvider._ID,movieDetails.getId());
-                Uri uri = getContentResolver().insert(
-                        MoviesProvider.CONTENT_URI, values);
-                Toast.makeText(getBaseContext(),
-                        uri.toString(), Toast.LENGTH_LONG).show();
-            }
-        });
+        Boolean buttonVisibility=getIntent().getBooleanExtra(Utils.FAVORITE_MOVIE_ID, false);
+        if(buttonVisibility) {
+            favorite.setClickable(false);
+            favorite.getBackground().setColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY);
+        }
+        else {
+            favorite.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    favorite.setClickable(false);
+                    favorite.getBackground().setColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY);
+                    ContentValues values = new ContentValues();
+                    values.put(MoviesProvider._ID, movieDetails.getId());
+                    Uri uri = getContentResolver().insert(
+                            MoviesProvider.CONTENT_URI, values);
+                    Toast.makeText(getBaseContext(),
+                            uri.toString(), Toast.LENGTH_LONG).show();
+                }
+            });
+        }
 
         //trailers
         for (TrailerClass trailer : trailerDetails)

@@ -21,6 +21,7 @@ import com.example.snehaanand.moviesapp.network.DownloadWebPageTask;
 import com.example.snehaanand.moviesapp.utils.Utils;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -31,6 +32,7 @@ import java.util.concurrent.ExecutionException;
 
 public class MainActivity extends AppCompatActivity {
     List<MovieClass> movieDetails = new ArrayList<>();
+    List<Integer> movieIds=new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,7 +44,45 @@ public class MainActivity extends AppCompatActivity {
         String sortType = sharedPrefs.getString(
                 getString(R.string.pref_sort_key), "popularity");
 
-        if(!sortType.equalsIgnoreCase("favorite")) {
+        //favorite
+        String URL = "content://"+Utils.CONTENT_BASE_URL+"/students";
+
+        Uri students = Uri.parse(URL);
+        Cursor c = managedQuery(students, null, null, null, MoviesProvider._ID);
+
+        if (c!=null&&c.moveToFirst()) {
+            do{
+                Integer movieId=c.getInt(c.getColumnIndex(MoviesProvider._ID));
+                movieIds.add(movieId);
+            } while (c.moveToNext());
+        }
+        //
+
+        if(sortType.equalsIgnoreCase("favorite")){
+            for(Integer movieId:movieIds) {
+                Uri builtUri = Uri.parse(Utils.MOVIEDB_BASE_URL).buildUpon().
+                        appendPath(Utils.PATH_MOVIE).appendPath(movieId.toString())
+                        .appendQueryParameter(Utils.QUERY_PARAMETER_API, Utils.API_KEY).build();
+                String MOVIE_DB_URL = builtUri.toString();
+                JsonArray movieJsonArray = new JsonArray();
+
+                try {
+                    JsonObject jsonObject = new DownloadWebPageTask().execute(MOVIE_DB_URL).get();
+                    movieJsonArray.add(jsonObject);
+                    movieDetails = new GetImageTask().execute(movieJsonArray).get();
+                    if (movieDetails != null) {
+                        gridview.setAdapter(new ImageAdapter(this, movieDetails));
+                    } else {
+                        Toast.makeText(getBaseContext(), R.string.no_internet_api, Toast.LENGTH_LONG).show();
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        else{
             Uri builtUri = Uri.parse(Utils.MOVIEDB_BASE_URL).buildUpon().appendPath("discover").
                     appendPath(Utils.PATH_MOVIE).appendQueryParameter("sort_by", sortType + ".desc")
                     .appendQueryParameter(Utils.QUERY_PARAMETER_API, Utils.API_KEY).build();
@@ -50,7 +90,8 @@ public class MainActivity extends AppCompatActivity {
 
 
             try {
-                JsonArray jsonArray = new DownloadWebPageTask().execute(MOVIE_DB_URL).get();
+                JsonObject jsonObject = new DownloadWebPageTask().execute(MOVIE_DB_URL).get();
+                JsonArray jsonArray = jsonObject.getAsJsonArray(Utils.RESULTS);
                 movieDetails = new GetImageTask().execute(jsonArray).get();
                 if (movieDetails != null) {
                     gridview.setAdapter(new ImageAdapter(this, movieDetails));
@@ -63,28 +104,18 @@ public class MainActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
-        else{
-            //favorite
 
-            String URL = "content://"+Utils.CONTENT_BASE_URL+"/students";
-
-            Uri students = Uri.parse(URL);
-            Cursor c = managedQuery(students, null, null, null, MoviesProvider._ID);
-
-            if (c!=null&&c.moveToFirst()) {
-                do{
-                    Toast.makeText(this,
-                            c.getString(c.getColumnIndex( MoviesProvider._ID)) ,
-                            Toast.LENGTH_SHORT).show();
-                } while (c.moveToNext());
-            }
-            //
-        }
         gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v,
                                     int position, long id) {
                 Intent intent = new Intent(MainActivity.this, DetailsActivity.class);
-                intent.putExtra(Utils.MOVIE_DETAILS, movieDetails.get(position));
+                MovieClass movieClass=movieDetails.get(position);
+                intent.putExtra(Utils.MOVIE_DETAILS, movieClass);
+                Boolean favoriteSetting=movieIds.contains(movieClass.getId());
+                if(favoriteSetting)
+                {
+                    intent.putExtra(Utils.FAVORITE_MOVIE_ID, true);
+                }
                 startActivity(intent);
             }
         });
