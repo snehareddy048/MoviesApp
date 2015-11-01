@@ -120,7 +120,6 @@ public class MainActivityFragment extends Fragment{
                     .appendQueryParameter(Utils.QUERY_PARAMETER_API, Utils.API_KEY).build();
             String MOVIE_DB_URL = builtUri.toString();
 
-
             try {
                 JsonObject jsonObject = new DownloadWebPageTask().execute(MOVIE_DB_URL).get();
                 JsonArray jsonArray = jsonObject.getAsJsonArray(Utils.RESULTS);

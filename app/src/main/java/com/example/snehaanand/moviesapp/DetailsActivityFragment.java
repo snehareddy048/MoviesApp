@@ -62,107 +62,109 @@ public class DetailsActivityFragment extends Fragment {
         final Button favorite = (Button) getActivity().findViewById(R.id.favorite);
 
         final MovieClass movieDetails = getActivity().getIntent().getParcelableExtra(Utils.MOVIE_DETAILS);
-        Uri reviewUri = Uri.parse(Utils.MOVIEDB_BASE_URL).buildUpon().appendPath(Utils.PATH_MOVIE).
-                appendPath(movieDetails.getId().toString()).appendPath(Utils.PATH_REVIEWS)
-                .appendQueryParameter(Utils.QUERY_PARAMETER_API, Utils.API_KEY).build();
-        String GET_REVIEWS_URL = reviewUri.toString();
+        if(movieDetails!=null) {
+            Uri reviewUri = Uri.parse(Utils.MOVIEDB_BASE_URL).buildUpon().appendPath(Utils.PATH_MOVIE).
+                    appendPath(movieDetails.getId().toString()).appendPath(Utils.PATH_REVIEWS)
+                    .appendQueryParameter(Utils.QUERY_PARAMETER_API, Utils.API_KEY).build();
+            String GET_REVIEWS_URL = reviewUri.toString();
 
-        Uri trailerUri = Uri.parse(Utils.MOVIEDB_BASE_URL).buildUpon().appendPath(Utils.PATH_MOVIE).
-                appendPath(movieDetails.getId().toString()).appendPath(Utils.PATH_VIDEOS)
-                .appendQueryParameter(Utils.QUERY_PARAMETER_API, Utils.API_KEY).build();
-        String GET_TRAILERS_URL = trailerUri.toString();
+            Uri trailerUri = Uri.parse(Utils.MOVIEDB_BASE_URL).buildUpon().appendPath(Utils.PATH_MOVIE).
+                    appendPath(movieDetails.getId().toString()).appendPath(Utils.PATH_VIDEOS)
+                    .appendQueryParameter(Utils.QUERY_PARAMETER_API, Utils.API_KEY).build();
+            String GET_TRAILERS_URL = trailerUri.toString();
 
-        try {
-            JsonObject jsonObject = new DownloadWebPageTask().execute(GET_REVIEWS_URL).get();
-            JsonArray jsonArray = jsonObject.getAsJsonArray(Utils.RESULTS);
-            for (int i = 0; i < jsonArray.size(); i++) {
-                ReviewClass reviewData = new Gson().fromJson(jsonArray.get(i), ReviewClass.class);
-                reviewDetails.add(reviewData);
+            try {
+                JsonObject jsonObject = new DownloadWebPageTask().execute(GET_REVIEWS_URL).get();
+                JsonArray jsonArray = jsonObject.getAsJsonArray(Utils.RESULTS);
+                for (int i = 0; i < jsonArray.size(); i++) {
+                    ReviewClass reviewData = new Gson().fromJson(jsonArray.get(i), ReviewClass.class);
+                    reviewDetails.add(reviewData);
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
             }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        }
 
-        try {
-            JsonObject jsonObject = new DownloadWebPageTask().execute(GET_TRAILERS_URL).get();
-            JsonArray jsonArray = jsonObject.getAsJsonArray(Utils.RESULTS);
-            for (int i = 0; i < jsonArray.size(); i++) {
-                TrailerClass trailerData = new Gson().fromJson(jsonArray.get(i), TrailerClass.class);
-                trailerDetails.add(trailerData);
+            try {
+                JsonObject jsonObject = new DownloadWebPageTask().execute(GET_TRAILERS_URL).get();
+                JsonArray jsonArray = jsonObject.getAsJsonArray(Utils.RESULTS);
+                for (int i = 0; i < jsonArray.size(); i++) {
+                    TrailerClass trailerData = new Gson().fromJson(jsonArray.get(i), TrailerClass.class);
+                    trailerDetails.add(trailerData);
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
             }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        }
 
-        movieName.setText(movieDetails.getOriginal_title());
-        userRating.setText(movieDetails.getVote_average().toString());
-        releaseDate.setText(movieDetails.getRelease_date());
-        synopsis.setText(movieDetails.getOverview());
-        movieImage.setImageBitmap(movieDetails.getDisplay_image());
-        Boolean buttonVisibility = getActivity().getIntent().getBooleanExtra(Utils.FAVORITE_MOVIE_ID, false);
-        if (buttonVisibility) {
-            favorite.setClickable(false);
-            favorite.getBackground().setColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY);
-        } else {
-            favorite.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    favorite.setClickable(false);
-                    favorite.getBackground().setColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY);
-                    ContentValues values = new ContentValues();
-                    values.put(MoviesProvider._ID, movieDetails.getId());
-                    Uri uri = getActivity().getContentResolver().insert(
-                            MoviesProvider.CONTENT_URI, values);
-                    Toast.makeText(getActivity().getBaseContext(),
-                            uri.toString(), Toast.LENGTH_LONG).show();
+            movieName.setText(movieDetails.getOriginal_title());
+            userRating.setText(movieDetails.getVote_average().toString());
+            releaseDate.setText(movieDetails.getRelease_date());
+            synopsis.setText(movieDetails.getOverview());
+            movieImage.setImageBitmap(movieDetails.getDisplay_image());
+            Boolean buttonVisibility = getActivity().getIntent().getBooleanExtra(Utils.FAVORITE_MOVIE_ID, false);
+            if (buttonVisibility) {
+                favorite.setClickable(false);
+                favorite.getBackground().setColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY);
+            } else {
+                favorite.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        favorite.setClickable(false);
+                        favorite.getBackground().setColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY);
+                        ContentValues values = new ContentValues();
+                        values.put(MoviesProvider._ID, movieDetails.getId());
+                        Uri uri = getActivity().getContentResolver().insert(
+                                MoviesProvider.CONTENT_URI, values);
+                        Toast.makeText(getActivity().getBaseContext(),
+                                uri.toString(), Toast.LENGTH_LONG).show();
+                    }
+                });
+            }
+
+            //trailers
+            for (TrailerClass trailer : trailerDetails) {
+                trailerName.add(trailer.getName());
+            }
+            trailerAdapter = new TrailerAdapter(getActivity(), trailerName);
+            //code to add header  to listview
+            LayoutInflater trailerInflator = getActivity().getLayoutInflater();
+            ViewGroup trailerHeaderValue = (ViewGroup) trailerInflator.inflate(R.layout.header, trailerVideos,
+                    false);
+            TextView headerValue = (TextView) trailerHeaderValue.findViewById(R.id.header_text);
+            headerValue.setText(this.getString(R.string.trailers));
+            trailerVideos.addHeaderView(trailerHeaderValue, null, false);
+            //code to add header  to listview
+            trailerVideos.setAdapter(trailerAdapter);
+            trailerVideos.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                public void onItemClick(AdapterView<?> parent, View v,
+                                        int position, long id) {
+                    String movieId = trailerDetails.get(position - 1).getKey();
+                    Uri movieUri = Uri.parse(Utils.YOUTUBE_BASE_URL).buildUpon().appendQueryParameter("v", movieId).build();
+                    String trailerUrl = movieUri.toString();
+                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(trailerUrl));
+                    startActivity(intent);
                 }
             });
-        }
 
-        //trailers
-        for (TrailerClass trailer : trailerDetails) {
-            trailerName.add(trailer.getName());
-        }
-        trailerAdapter = new TrailerAdapter(getActivity(), trailerName);
-        //code to add header  to listview
-        LayoutInflater trailerInflator = getActivity().getLayoutInflater();
-        ViewGroup trailerHeaderValue = (ViewGroup) trailerInflator.inflate(R.layout.header, trailerVideos,
-                false);
-        TextView headerValue = (TextView) trailerHeaderValue.findViewById(R.id.header_text);
-        headerValue.setText(this.getString(R.string.trailers));
-        trailerVideos.addHeaderView(trailerHeaderValue, null, false);
-        //code to add header  to listview
-        trailerVideos.setAdapter(trailerAdapter);
-        trailerVideos.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            public void onItemClick(AdapterView<?> parent, View v,
-                                    int position, long id) {
-                String movieId = trailerDetails.get(position - 1).getKey();
-                Uri movieUri = Uri.parse(Utils.YOUTUBE_BASE_URL).buildUpon().appendQueryParameter("v", movieId).build();
-                String trailerUrl = movieUri.toString();
-                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(trailerUrl));
-                startActivity(intent);
+            //reviews
+            for (ReviewClass review : reviewDetails) {
+                author.add(review.getAuthor());
+                content.add(review.getContent());
             }
-        });
+            reviewAdapter = new ReviewAdapter(getActivity(), author, content);
+            //code to add header  to listview
+            LayoutInflater inflater = getActivity().getLayoutInflater();
+            ViewGroup reviewHeader = (ViewGroup) inflater.inflate(R.layout.header, userReviews,
+                    false);
+            TextView reviewHeaderValue = (TextView) reviewHeader.findViewById(R.id.header_text);
+            reviewHeaderValue.setText(this.getString(R.string.reviews));
+            userReviews.addHeaderView(reviewHeader, null, false);
+            //code to add header  to listview
 
-        //reviews
-        for (ReviewClass review : reviewDetails) {
-            author.add(review.getAuthor());
-            content.add(review.getContent());
+            userReviews.setAdapter(reviewAdapter);
         }
-        reviewAdapter = new ReviewAdapter(getActivity(), author, content);
-        //code to add header  to listview
-        LayoutInflater inflater = getActivity().getLayoutInflater();
-        ViewGroup reviewHeader = (ViewGroup) inflater.inflate(R.layout.header, userReviews,
-                false);
-        TextView reviewHeaderValue = (TextView) reviewHeader.findViewById(R.id.header_text);
-        reviewHeaderValue.setText(this.getString(R.string.reviews));
-        userReviews.addHeaderView(reviewHeader, null, false);
-        //code to add header  to listview
-
-        userReviews.setAdapter(reviewAdapter);
     }
 }
