@@ -31,118 +31,31 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 public class MainActivity extends AppCompatActivity {
-    List<MovieClass> movieDetails = new ArrayList<>();
-    List<Integer> movieIds=new ArrayList<>();
+Boolean mTwoPane;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        GridView gridview = (GridView) findViewById(R.id.gridView);
-        SharedPreferences sharedPrefs =
-                PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-        String sortType = sharedPrefs.getString(
-                getString(R.string.pref_sort_key), "popularity");
-
-        //favorite
-        String URL = "content://"+Utils.CONTENT_BASE_URL+"/students";
-
-        Uri students = Uri.parse(URL);
-        Cursor c = managedQuery(students, null, null, null, MoviesProvider._ID);
-
-        if (c!=null&&c.moveToFirst()) {
-            do{
-                Integer movieId=c.getInt(c.getColumnIndex(MoviesProvider._ID));
-                movieIds.add(movieId);
-            } while (c.moveToNext());
-        }
-        //
-
-        if(sortType.equalsIgnoreCase("favorite")){
-            for(Integer movieId:movieIds) {
-                Uri builtUri = Uri.parse(Utils.MOVIEDB_BASE_URL).buildUpon().
-                        appendPath(Utils.PATH_MOVIE).appendPath(movieId.toString())
-                        .appendQueryParameter(Utils.QUERY_PARAMETER_API, Utils.API_KEY).build();
-                String MOVIE_DB_URL = builtUri.toString();
-                JsonArray movieJsonArray = new JsonArray();
-
-                try {
-                    JsonObject jsonObject = new DownloadWebPageTask().execute(MOVIE_DB_URL).get();
-                    movieJsonArray.add(jsonObject);
-                    movieDetails = new GetImageTask().execute(movieJsonArray).get();
-                    if (movieDetails != null) {
-                        gridview.setAdapter(new ImageAdapter(this, movieDetails));
-                    } else {
-                        Toast.makeText(getBaseContext(), R.string.no_internet_api, Toast.LENGTH_LONG).show();
-                    }
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                } catch (ExecutionException e) {
-                    e.printStackTrace();
-                }
+        if (findViewById(R.id.fragment_popularMovies_detail) != null) {
+            // The detail container view will be present only in the large-screen layouts
+            // (res/layout-sw600dp). If this view is present, then the activity should be
+            // in two-pane mode.
+            mTwoPane = true;
+            // In two-pane mode, show the detail view in this activity by
+            // adding or replacing the detail fragment using a
+            // fragment transaction.
+            if (savedInstanceState == null) {
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_popularMovies_detail, new DetailsActivityFragment(), null)
+                        .commit();
             }
+        } else {
+            mTwoPane = false;
         }
-        else{
-            Uri builtUri = Uri.parse(Utils.MOVIEDB_BASE_URL).buildUpon().appendPath("discover").
-                    appendPath(Utils.PATH_MOVIE).appendQueryParameter("sort_by", sortType + ".desc")
-                    .appendQueryParameter(Utils.QUERY_PARAMETER_API, Utils.API_KEY).build();
-            String MOVIE_DB_URL = builtUri.toString();
-
-
-            try {
-                JsonObject jsonObject = new DownloadWebPageTask().execute(MOVIE_DB_URL).get();
-                JsonArray jsonArray = jsonObject.getAsJsonArray(Utils.RESULTS);
-                movieDetails = new GetImageTask().execute(jsonArray).get();
-                if (movieDetails != null) {
-                    gridview.setAdapter(new ImageAdapter(this, movieDetails));
-                } else {
-                    Toast.makeText(getBaseContext(), R.string.no_internet_api, Toast.LENGTH_LONG).show();
-                }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (ExecutionException e) {
-                e.printStackTrace();
-            }
-        }
-
-        gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            public void onItemClick(AdapterView<?> parent, View v,
-                                    int position, long id) {
-                Intent intent = new Intent(MainActivity.this, DetailsActivity.class);
-                MovieClass movieClass=movieDetails.get(position);
-                intent.putExtra(Utils.MOVIE_DETAILS, movieClass);
-                Boolean favoriteSetting=movieIds.contains(movieClass.getId());
-                if(favoriteSetting)
-                {
-                    intent.putExtra(Utils.FAVORITE_MOVIE_ID, true);
-                }
-                startActivity(intent);
-            }
-        });
     }
 
-    private class GetImageTask extends AsyncTask<JsonArray, Void, List> {
-        @Override
-        protected List<MovieClass> doInBackground(JsonArray... jsonArray) {
-            return parseResult(jsonArray[0]);
-        }
 
-        private List<MovieClass> parseResult(JsonArray jsonArray) {
-            for (int i = 0; i < jsonArray.size(); i++) {
-                MovieClass data = new Gson().fromJson(jsonArray.get(i), MovieClass.class);
-                try {
-                    URL url = new URL("http://image.tmdb.org/t/p/w185/" + data.getPoster_path());
-                    data.setDisplay_image(BitmapFactory.decodeStream(url.openConnection().getInputStream()));
-                    movieDetails.add(data);
-                } catch (MalformedURLException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-            return movieDetails;
-        }
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

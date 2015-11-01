@@ -13,6 +13,8 @@ public interface Utils
     String PATH_REVIEWS="reviews";
     String PATH_VIDEOS="videos";
     String QUERY_PARAMETER_API="api_key";
-    String API_KEY="YOUR_API_KEY";
     String FAVORITE_MOVIE_ID="favorite_id";
+    String RESULTS="results";
+    String API_KEY="YOUR_API_KEY";
 }
+
