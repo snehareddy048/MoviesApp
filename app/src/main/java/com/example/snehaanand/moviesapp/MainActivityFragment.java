@@ -1,10 +1,13 @@
 package com.example.snehaanand.moviesapp;
 
 import android.app.Fragment;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.BitmapFactory;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -89,8 +92,11 @@ public class MainActivityFragment extends Fragment{
             } while (c.moveToNext());
         }
         //
-
-        if(sortType.equalsIgnoreCase("favorite")){
+        if(!isNetworkAvailable()){
+            Toast.makeText(getActivity().getBaseContext(), R.string.no_internet, Toast.LENGTH_LONG).show();
+        }
+        else if(sortType.equalsIgnoreCase("favorite"))
+        {
             for(Integer movieId:movieIds) {
                 Uri builtUri = Uri.parse(Utils.MOVIEDB_BASE_URL).buildUpon().
                         appendPath(Utils.PATH_MOVIE).appendPath(movieId.toString())
@@ -104,8 +110,6 @@ public class MainActivityFragment extends Fragment{
                     movieDetails = new GetImageTask().execute(movieJsonArray).get();
                     if (movieDetails != null) {
                         gridview.setAdapter(new ImageAdapter(getActivity(), movieDetails));
-                    } else {
-                        Toast.makeText(getActivity().getBaseContext(), R.string.no_internet_api, Toast.LENGTH_LONG).show();
                     }
                 } catch (InterruptedException e) {
                     e.printStackTrace();
@@ -114,7 +118,8 @@ public class MainActivityFragment extends Fragment{
                 }
             }
         }
-        else{
+        else
+        {
             Uri builtUri = Uri.parse(Utils.MOVIEDB_BASE_URL).buildUpon().appendPath("discover").
                     appendPath(Utils.PATH_MOVIE).appendQueryParameter("sort_by", sortType + ".desc")
                     .appendQueryParameter(Utils.QUERY_PARAMETER_API, Utils.API_KEY).build();
@@ -126,8 +131,6 @@ public class MainActivityFragment extends Fragment{
                 movieDetails = new GetImageTask().execute(jsonArray).get();
                 if (movieDetails != null) {
                     gridview.setAdapter(new ImageAdapter(getActivity(), movieDetails));
-                } else {
-                    Toast.makeText(getActivity().getBaseContext(), R.string.no_internet_api, Toast.LENGTH_LONG).show();
                 }
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -149,6 +152,12 @@ public class MainActivityFragment extends Fragment{
                 startActivity(intent);
             }
         });
+    }
 
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 }

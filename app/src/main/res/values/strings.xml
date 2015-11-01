@@ -12,5 +12,6 @@
     <string name="release_date">Release date</string>
     <string name="title_activity_details">DetailsActivity</string>
     <string name="mark_favorite">Mark as favorite</string>
+    <string name="no_internet">No internet connectivity</string>
 
 </resources>
