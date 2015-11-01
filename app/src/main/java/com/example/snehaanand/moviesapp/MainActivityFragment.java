@@ -142,14 +142,18 @@ public class MainActivityFragment extends Fragment{
         gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v,
                                     int position, long id) {
-                Intent intent = new Intent(getActivity(), DetailsActivity.class);
                 MovieClass movieClass = movieDetails.get(position);
-                intent.putExtra(Utils.MOVIE_DETAILS, movieClass);
                 Boolean favoriteSetting = movieIds.contains(movieClass.getId());
-                if (favoriteSetting) {
-                    intent.putExtra(Utils.FAVORITE_MOVIE_ID, true);
-                }
-                startActivity(intent);
+                PaneSelection paneSelection =(MainActivityFragment.PaneSelection)getActivity();
+                paneSelection.onItemSelection(movieClass,favoriteSetting);
+//                Intent intent = new Intent(getActivity(), DetailsActivity.class);
+//                MovieClass movieClass = movieDetails.get(position);
+//                intent.putExtra(Utils.MOVIE_DETAILS, movieClass);
+//                Boolean favoriteSetting = movieIds.contains(movieClass.getId());
+//                if (favoriteSetting) {
+//                    intent.putExtra(Utils.FAVORITE_MOVIE_ID, true);
+//                }
+//                startActivity(intent);
             }
         });
     }
@@ -159,5 +163,10 @@ public class MainActivityFragment extends Fragment{
                 = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
+
+    public interface PaneSelection
+    {
+        public void onItemSelection(MovieClass movieClass,Boolean favoriteSetting );
     }
 }

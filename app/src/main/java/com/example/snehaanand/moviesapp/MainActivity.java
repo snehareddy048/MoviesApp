@@ -30,8 +30,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements MainActivityFragment.PaneSelection {
 Boolean mTwoPane;
+    String DETAILS_TAG="details";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,7 +48,7 @@ Boolean mTwoPane;
             // fragment transaction.
 //            if (savedInstanceState == null) {//TODO:know use of this
                 getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_popularMovies_detail, new DetailsActivityFragment(), null)
+                        .replace(R.id.fragment_popularMovies_detail, new DetailsActivityFragment(), DETAILS_TAG)
                         .commit();
             //}
         } else {
@@ -80,4 +81,33 @@ Boolean mTwoPane;
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onItemSelection(MovieClass movieClass,Boolean favoriteSetting) {
+        if(mTwoPane){
+            Bundle arguments = new Bundle();
+            arguments.putParcelable(Utils.MOVIE_DETAILS, movieClass);
+            if (favoriteSetting)
+                 arguments.putBoolean(Utils.FAVORITE_MOVIE_ID, true);
+
+            DetailsActivityFragment fragment = new DetailsActivityFragment();
+            fragment.setArguments(arguments);
+
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_popularMovies_detail, fragment, DETAILS_TAG)
+                    .commit();
+
+        }
+        else{
+            Intent intent = new Intent(this, DetailsActivity.class);
+            Bundle bundle = new Bundle();
+            bundle.putParcelable(Utils.MOVIE_DETAILS, movieClass);
+
+            //intent.putExtra(Utils.MOVIE_DETAILS, movieClass);
+            if (favoriteSetting) {
+                bundle.putBoolean(Utils.FAVORITE_MOVIE_ID, true);
+            }
+            intent.putExtras(bundle);
+            startActivity(intent);
+        }
+    }
 }
