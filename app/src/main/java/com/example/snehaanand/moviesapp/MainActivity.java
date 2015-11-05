@@ -1,34 +1,13 @@
 package com.example.snehaanand.moviesapp;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.database.Cursor;
-import android.graphics.BitmapFactory;
-import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.GridView;
-import android.widget.Toast;
 
 import com.example.snehaanand.moviesapp.model.MovieClass;
-import com.example.snehaanand.moviesapp.network.DownloadWebPageTask;
 import com.example.snehaanand.moviesapp.utils.Utils;
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 public class MainActivity extends AppCompatActivity implements MainActivityFragment.PaneSelection {
 Boolean mTwoPane;
@@ -86,28 +65,27 @@ Boolean mTwoPane;
         if(mTwoPane){
             Bundle arguments = new Bundle();
             arguments.putParcelable(Utils.MOVIE_DETAILS, movieClass);
-            if (favoriteSetting)
-                 arguments.putBoolean(Utils.FAVORITE_MOVIE_ID, true);
-
-            DetailsActivityFragment fragment = new DetailsActivityFragment();
+            if (favoriteSetting) {
+                arguments.putBoolean(Utils.FAVORITE_MOVIE_ID, true);
+            }
+                DetailsActivityFragment fragment = new DetailsActivityFragment();
             fragment.setArguments(arguments);
-
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.fragment_popularMovies_detail, fragment, DETAILS_TAG)
                     .commit();
-
         }
         else{
-            Intent intent = new Intent(this, DetailsActivity.class);
+            Intent intent = new Intent();
             Bundle bundle = new Bundle();
-            bundle.putParcelable(Utils.MOVIE_DETAILS, movieClass);
-
-            //intent.putExtra(Utils.MOVIE_DETAILS, movieClass);
+            bundle.putParcelable(Utils.MOVIE_DETAILS_ACTIVITY, movieClass);
             if (favoriteSetting) {
-                bundle.putBoolean(Utils.FAVORITE_MOVIE_ID, true);
+                bundle.putBoolean(Utils.FAVORITE_SETTING, true);
             }
             intent.putExtras(bundle);
+            intent.setClass(MainActivity.this, DetailsActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
         }
     }
+
 }

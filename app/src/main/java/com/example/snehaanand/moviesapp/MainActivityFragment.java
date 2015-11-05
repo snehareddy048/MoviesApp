@@ -2,7 +2,6 @@ package com.example.snehaanand.moviesapp;
 
 import android.app.Fragment;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.BitmapFactory;
@@ -11,6 +10,7 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -146,14 +146,6 @@ public class MainActivityFragment extends Fragment{
                 Boolean favoriteSetting = movieIds.contains(movieClass.getId());
                 PaneSelection paneSelection =(MainActivityFragment.PaneSelection)getActivity();
                 paneSelection.onItemSelection(movieClass,favoriteSetting);
-//                Intent intent = new Intent(getActivity(), DetailsActivity.class);
-//                MovieClass movieClass = movieDetails.get(position);
-//                intent.putExtra(Utils.MOVIE_DETAILS, movieClass);
-//                Boolean favoriteSetting = movieIds.contains(movieClass.getId());
-//                if (favoriteSetting) {
-//                    intent.putExtra(Utils.FAVORITE_MOVIE_ID, true);
-//                }
-//                startActivity(intent);
             }
         });
     }
@@ -167,6 +159,8 @@ public class MainActivityFragment extends Fragment{
 
     public interface PaneSelection
     {
-        public void onItemSelection(MovieClass movieClass,Boolean favoriteSetting );
+        void onItemSelection(MovieClass movieClass,Boolean favoriteSetting );
     }
+
+
 }

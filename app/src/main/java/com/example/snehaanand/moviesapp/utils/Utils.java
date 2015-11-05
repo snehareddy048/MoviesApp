@@ -6,6 +6,8 @@ package com.example.snehaanand.moviesapp.utils;
 public interface Utils
 {
     String MOVIE_DETAILS="movie_details";
+    String MOVIE_DETAILS_ACTIVITY ="movie_details_activity";
+    String FAVORITE_SETTING="favorite_setting";
     String MOVIEDB_BASE_URL ="http://api.themoviedb.org/3/";
     String YOUTUBE_BASE_URL="https://www.youtube.com/watch";
     String CONTENT_BASE_URL="com.example.provider.College";
