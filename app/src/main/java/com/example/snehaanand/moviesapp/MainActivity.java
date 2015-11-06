@@ -25,17 +25,15 @@ Boolean mTwoPane;
             // In two-pane mode, show the detail view in this activity by
             // adding or replacing the detail fragment using a
             // fragment transaction.
-//            if (savedInstanceState == null) {//TODO:know use of this
+           if (savedInstanceState == null) {
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.fragment_popularMovies_detail, new DetailsActivityFragment(), DETAILS_TAG)
                         .commit();
-            //}
+            }
         } else {
             mTwoPane = false;
         }
     }
-
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

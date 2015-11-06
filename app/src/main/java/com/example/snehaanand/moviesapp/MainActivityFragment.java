@@ -37,9 +37,11 @@ import java.util.concurrent.ExecutionException;
  * Created by snehaanandyeluguri on 10/31/15.
  */
 public class MainActivityFragment extends Fragment{
-    List<MovieClass> movieDetails = new ArrayList<>();
-    List<Integer> movieIds=new ArrayList<>();
+    ArrayList<MovieClass> movieDetails = new ArrayList<>();
+    ArrayList<Integer> movieIds=new ArrayList<>();
     GridView gridview;
+    public final String FAVORITE_MOVIES="favorite_movies";
+    public final String MOVIE_KEY="movie_list_key";
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -73,6 +75,9 @@ public class MainActivityFragment extends Fragment{
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        ImageAdapter imageAdapter=new ImageAdapter(getActivity(),movieDetails);
+
+
         gridview = (GridView) getActivity().findViewById(R.id.gridView);
         SharedPreferences sharedPrefs =
                 PreferenceManager.getDefaultSharedPreferences(getActivity().getBaseContext());
@@ -91,8 +96,14 @@ public class MainActivityFragment extends Fragment{
                 movieIds.add(movieId);
             } while (c.moveToNext());
         }
-        //
-        if(!isNetworkAvailable()){
+        gridview.setAdapter(imageAdapter);
+        if (savedInstanceState != null) {
+            movieIds = savedInstanceState.getIntegerArrayList(FAVORITE_MOVIES);
+            movieDetails = (ArrayList<MovieClass>)savedInstanceState.get(MOVIE_KEY);
+            imageAdapter.setGridData(movieDetails);
+        }
+
+       else  if(!isNetworkAvailable()){
             Toast.makeText(getActivity().getBaseContext(), R.string.no_internet, Toast.LENGTH_LONG).show();
         }
         else if(sortType.equalsIgnoreCase("favorite"))
@@ -107,9 +118,9 @@ public class MainActivityFragment extends Fragment{
                 try {
                     JsonObject jsonObject = new DownloadWebPageTask().execute(MOVIE_DB_URL).get();
                     movieJsonArray.add(jsonObject);
-                    movieDetails = new GetImageTask().execute(movieJsonArray).get();
-                    if (movieDetails != null) {
-                        gridview.setAdapter(new ImageAdapter(getActivity(), movieDetails));
+                    movieDetails = (ArrayList<MovieClass>) new GetImageTask().execute(movieJsonArray).get();
+                    if(movieDetails!=null) {
+                        imageAdapter.setGridData(movieDetails);
                     }
                 } catch (InterruptedException e) {
                     e.printStackTrace();
@@ -128,11 +139,11 @@ public class MainActivityFragment extends Fragment{
             try {
                 JsonObject jsonObject = new DownloadWebPageTask().execute(MOVIE_DB_URL).get();
                 JsonArray jsonArray = jsonObject.getAsJsonArray(Utils.RESULTS);
-                movieDetails = new GetImageTask().execute(jsonArray).get();
-                if (movieDetails != null) {
-                    gridview.setAdapter(new ImageAdapter(getActivity(), movieDetails));
+                movieDetails = (ArrayList<MovieClass>) new GetImageTask().execute(jsonArray).get();
+                if(movieDetails!=null) {
+                    imageAdapter.setGridData(movieDetails);
                 }
-            } catch (InterruptedException e) {
+                } catch (InterruptedException e) {
                 e.printStackTrace();
             } catch (ExecutionException e) {
                 e.printStackTrace();
@@ -162,5 +173,10 @@ public class MainActivityFragment extends Fragment{
         void onItemSelection(MovieClass movieClass,Boolean favoriteSetting );
     }
 
-
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putIntegerArrayList(FAVORITE_MOVIES, movieIds);
+        outState.putParcelableArrayList(MOVIE_KEY, movieDetails);
+    }
 }

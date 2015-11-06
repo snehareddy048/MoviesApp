@@ -16,14 +16,14 @@ import java.util.List;
  */
 public class ImageAdapter extends BaseAdapter {
     private Context context;
-    private List<MovieClass> thumbIds = new ArrayList();
+    private ArrayList<MovieClass> thumbIds = new ArrayList();
 
-    public ImageAdapter(Context c, List<MovieClass> movieBitmaps) {
+    public ImageAdapter(Context c, ArrayList<MovieClass> movieBitmaps) {
         context = c;
         thumbIds = movieBitmaps;
     }
 
-    public ImageAdapter(Context c, List<String> list,List<MovieClass> movieBitmaps) {
+    public ImageAdapter(Context c, ArrayList<String> list,ArrayList<MovieClass> movieBitmaps) {
         context = c;
         thumbIds = movieBitmaps;
     }
@@ -52,6 +52,11 @@ public class ImageAdapter extends BaseAdapter {
         }
         imageView.setImageBitmap(thumbIds.get(position).getDisplay_image());
         return imageView;
+    }
+
+    public void setGridData(ArrayList<MovieClass> MovieClassObjects) {
+        this.thumbIds = MovieClassObjects;
+        notifyDataSetChanged();
     }
 
 }

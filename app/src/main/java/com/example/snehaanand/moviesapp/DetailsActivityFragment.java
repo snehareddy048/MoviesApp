@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -42,6 +43,12 @@ public class DetailsActivityFragment extends Fragment {
     ArrayList<String> author=new ArrayList<>();
     ArrayList<String> content=new ArrayList<>();
     ArrayList<String> trailerName=new ArrayList<>();
+    MovieClass movieDetails;
+    public final String TRAILERS_KEY="trailers";
+    public final String REVIEWS_KEY="reviews";
+    public final String MOVIE_DETAILS_KEY="movie_details";
+
+
 
     @Nullable
     @Override
@@ -62,10 +69,11 @@ public class DetailsActivityFragment extends Fragment {
         final Button favorite = (Button) getActivity().findViewById(R.id.favorite);
 
         Bundle arguments = getArguments();
-
-        if (arguments != null)
+        if(savedInstanceState!=null)
+        {}
+        else if (arguments != null)
         {
-            final MovieClass movieDetails = arguments.getParcelable(Utils.MOVIE_DETAILS);
+            movieDetails = arguments.getParcelable(Utils.MOVIE_DETAILS);
             if (movieDetails != null)
             {
                 Uri reviewUri = Uri.parse(Utils.MOVIEDB_BASE_URL).buildUpon().appendPath(Utils.PATH_MOVIE).
@@ -170,7 +178,18 @@ public class DetailsActivityFragment extends Fragment {
                 //code to add header  to listview
 
                 userReviews.setAdapter(reviewAdapter);
+                //TODO:notify dataset changed
+
             }
         }
     }
+
+    @Override
+     public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable(MOVIE_DETAILS_KEY, movieDetails);
+        outState.putParcelableArrayList(TRAILERS_KEY, (ArrayList<? extends Parcelable>) trailerDetails);
+        outState.putParcelableArrayList(REVIEWS_KEY, (ArrayList<? extends Parcelable>) reviewDetails);
+    }
+
 }
