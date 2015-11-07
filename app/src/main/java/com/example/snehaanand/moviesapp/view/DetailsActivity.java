@@ -1,8 +1,9 @@
-package com.example.snehaanand.moviesapp;
+package com.example.snehaanand.moviesapp.view;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
+import com.example.snehaanand.moviesapp.R;
 import com.example.snehaanand.moviesapp.model.MovieClass;
 import com.example.snehaanand.moviesapp.utils.Utils;
 

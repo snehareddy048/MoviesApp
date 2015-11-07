@@ -1,4 +1,4 @@
-package com.example.snehaanand.moviesapp;
+package com.example.snehaanand.moviesapp.view;
 
 import android.content.ContentValues;
 import android.content.Intent;
@@ -6,7 +6,6 @@ import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -19,25 +18,28 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.snehaanand.moviesapp.R;
 import com.example.snehaanand.moviesapp.model.MovieClass;
 import com.example.snehaanand.moviesapp.model.ReviewClass;
 import com.example.snehaanand.moviesapp.model.TrailerClass;
 import com.example.snehaanand.moviesapp.network.DownloadWebPageTask;
 import com.example.snehaanand.moviesapp.utils.Utils;
+import com.example.snehaanand.moviesapp.view.MoviesProvider;
+import com.example.snehaanand.moviesapp.view.adapter.ReviewAdapter;
+import com.example.snehaanand.moviesapp.view.adapter.TrailerAdapter;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 /**
  * Created by snehaanandyeluguri on 10/31/15.
  */
 public class DetailsActivityFragment extends Fragment {
-    List<ReviewClass> reviewDetails = new ArrayList<>();
-    List<TrailerClass> trailerDetails = new ArrayList<>();
+    ArrayList<ReviewClass> reviewDetails = new ArrayList<>();
+    ArrayList<TrailerClass> trailerDetails = new ArrayList<>();
     ReviewAdapter reviewAdapter;
     TrailerAdapter trailerAdapter;
     ArrayList<String> author=new ArrayList<>();
@@ -47,8 +49,6 @@ public class DetailsActivityFragment extends Fragment {
     public final String TRAILERS_KEY="trailers";
     public final String REVIEWS_KEY="reviews";
     public final String MOVIE_DETAILS_KEY="movie_details";
-
-
 
     @Nullable
     @Override
@@ -70,11 +70,14 @@ public class DetailsActivityFragment extends Fragment {
 
         Bundle arguments = getArguments();
         if(savedInstanceState!=null)
-        {}
-        else if (arguments != null)
         {
+            movieDetails=savedInstanceState.getParcelable(MOVIE_DETAILS_KEY);
+            reviewDetails=(ArrayList<ReviewClass>)savedInstanceState.get(REVIEWS_KEY);
+            trailerDetails=(ArrayList<TrailerClass>)savedInstanceState.get(TRAILERS_KEY);
+        }
+        else if (arguments != null) {
             movieDetails = arguments.getParcelable(Utils.MOVIE_DETAILS);
-            if (movieDetails != null)
+            if(movieDetails!=null)
             {
                 Uri reviewUri = Uri.parse(Utils.MOVIEDB_BASE_URL).buildUpon().appendPath(Utils.PATH_MOVIE).
                         appendPath(movieDetails.getId().toString()).appendPath(Utils.PATH_REVIEWS)
@@ -111,7 +114,10 @@ public class DetailsActivityFragment extends Fragment {
                 } catch (ExecutionException e) {
                     e.printStackTrace();
                 }
-
+            }
+        }
+            if (movieDetails != null)
+            {
                 movieName.setText(movieDetails.getOriginal_title());
                 userRating.setText(movieDetails.getVote_average().toString());
                 releaseDate.setText(movieDetails.getRelease_date());
@@ -178,18 +184,17 @@ public class DetailsActivityFragment extends Fragment {
                 //code to add header  to listview
 
                 userReviews.setAdapter(reviewAdapter);
-                //TODO:notify dataset changed
-
             }
-        }
+
     }
 
     @Override
-     public void onSaveInstanceState(Bundle outState) {
+     public void onSaveInstanceState(Bundle outState)
+    {
         super.onSaveInstanceState(outState);
         outState.putParcelable(MOVIE_DETAILS_KEY, movieDetails);
-        outState.putParcelableArrayList(TRAILERS_KEY, (ArrayList<? extends Parcelable>) trailerDetails);
-        outState.putParcelableArrayList(REVIEWS_KEY, (ArrayList<? extends Parcelable>) reviewDetails);
+        outState.putParcelableArrayList(REVIEWS_KEY, reviewDetails);
+        outState.putParcelableArrayList(TRAILERS_KEY,trailerDetails);
     }
 
 }

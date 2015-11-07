@@ -7,7 +7,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.example.snehaanand.moviesapp.DetailsActivityFragment">
+    tools:context="com.example.snehaanand.moviesapp.view.DetailsActivityFragment">
 
     <ScrollView
         android:id="@+id/movie_details_scroll_view"

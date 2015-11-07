@@ -1,4 +1,4 @@
-package com.example.snehaanand.moviesapp;
+package com.example.snehaanand.moviesapp.view.adapter;
 
 import android.content.Context;
 import android.view.View;

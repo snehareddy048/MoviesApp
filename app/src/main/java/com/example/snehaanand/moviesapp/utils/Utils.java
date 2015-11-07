@@ -10,7 +10,7 @@ public interface Utils
     String FAVORITE_SETTING="favorite_setting";
     String MOVIEDB_BASE_URL ="http://api.themoviedb.org/3/";
     String YOUTUBE_BASE_URL="https://www.youtube.com/watch";
-    String CONTENT_BASE_URL="com.example.provider.College";
+    String CONTENT_BASE_URL="com.example.provider.MovieDB";
     String PATH_MOVIE="movie";
     String PATH_REVIEWS="reviews";
     String PATH_VIDEOS="videos";
@@ -18,5 +18,6 @@ public interface Utils
     String FAVORITE_MOVIE_ID="favorite_id";
     String RESULTS="results";
     String API_KEY="YOUR_API_KEY";
+    String MOVIES_TEXT="movies";
 }
 

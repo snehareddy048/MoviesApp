@@ -1,8 +1,5 @@
-package com.example.snehaanand.moviesapp;
+package com.example.snehaanand.moviesapp.view.adapter;
 
-/**
- * Created by snehaanandyeluguri on 10/18/15.
- */
 import android.app.Activity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,23 +7,26 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import com.example.snehaanand.moviesapp.R;
+
 import java.util.ArrayList;
 
-public class ReviewAdapter extends BaseAdapter
-{
-    Activity context;
-    ArrayList<String> author;
-    ArrayList<String> content;
+/**
+ * Created by snehaanandyeluguri on 10/22/15.
+ */
+public class TrailerAdapter extends BaseAdapter {
 
-    public ReviewAdapter(Activity context, ArrayList<String> author, ArrayList<String> content) {
+    Activity context;
+    ArrayList<String> trailerName;
+
+    public TrailerAdapter(Activity context, ArrayList<String> trailerName) {
         super();
         this.context = context;
-        this.author = author;
-        this.content = content;
+        this.trailerName = trailerName;
     }
 
     public int getCount() {
-        return author.size();
+        return trailerName.size();
     }
 
     public Object getItem(int position) {
@@ -38,8 +38,8 @@ public class ReviewAdapter extends BaseAdapter
     }
 
     private class ViewHolder {
-        TextView txtViewAuthor;
-        TextView txtViewContent;
+        TextView trailerName;
+
     }
 
     public View getView(int position, View convertView, ViewGroup parent)
@@ -50,10 +50,9 @@ public class ReviewAdapter extends BaseAdapter
 
         if (convertView == null)
         {
-            convertView = inflater.inflate(R.layout.list_review_row, null);
+            convertView = inflater.inflate(R.layout.list_trailer_row, null);
             holder = new ViewHolder();
-            holder.txtViewAuthor = (TextView) convertView.findViewById(R.id.author);
-            holder.txtViewContent = (TextView) convertView.findViewById(R.id.content);
+            holder.trailerName = (TextView) convertView.findViewById(R.id.trailerName);
             convertView.setTag(holder);
         }
         else
@@ -61,10 +60,8 @@ public class ReviewAdapter extends BaseAdapter
             holder = (ViewHolder) convertView.getTag();
         }
 
-        holder.txtViewAuthor.setText(author.get(position));
-        holder.txtViewContent.setText(content.get(position));
+        holder.trailerName.setText(trailerName.get(position));
 
         return convertView;
     }
-
 }

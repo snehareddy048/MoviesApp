@@ -1,4 +1,4 @@
-package com.example.snehaanand.moviesapp;
+package com.example.snehaanand.moviesapp.view;
 
 import android.app.Fragment;
 import android.content.Context;
@@ -10,7 +10,6 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,9 +18,11 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.Toast;
 
+import com.example.snehaanand.moviesapp.R;
 import com.example.snehaanand.moviesapp.model.MovieClass;
 import com.example.snehaanand.moviesapp.network.DownloadWebPageTask;
 import com.example.snehaanand.moviesapp.utils.Utils;
+import com.example.snehaanand.moviesapp.view.adapter.ImageAdapter;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -85,10 +86,10 @@ public class MainActivityFragment extends Fragment{
                 getString(R.string.pref_sort_key), "popularity");
 
         //favorite
-        String URL = "content://"+ Utils.CONTENT_BASE_URL+"/students";
+        String URL = "content://"+ Utils.CONTENT_BASE_URL+"/"+Utils.MOVIES_TEXT;
 
-        Uri students = Uri.parse(URL);
-        Cursor c = getActivity().managedQuery(students, null, null, null, MoviesProvider._ID);
+        Uri movies = Uri.parse(URL);
+        Cursor c = getActivity().managedQuery(movies, null, null, null, MoviesProvider._ID);
 
         if (c!=null&&c.moveToFirst()) {
             do{
@@ -174,7 +175,8 @@ public class MainActivityFragment extends Fragment{
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(Bundle outState)
+    {
         super.onSaveInstanceState(outState);
         outState.putIntegerArrayList(FAVORITE_MOVIES, movieIds);
         outState.putParcelableArrayList(MOVIE_KEY, movieDetails);

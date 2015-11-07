@@ -1,4 +1,4 @@
-package com.example.snehaanand.moviesapp;
+package com.example.snehaanand.moviesapp.view;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.example.snehaanand.moviesapp.R;
 import com.example.snehaanand.moviesapp.model.MovieClass;
 import com.example.snehaanand.moviesapp.utils.Utils;
 
@@ -66,7 +67,7 @@ Boolean mTwoPane;
             if (favoriteSetting) {
                 arguments.putBoolean(Utils.FAVORITE_MOVIE_ID, true);
             }
-                DetailsActivityFragment fragment = new DetailsActivityFragment();
+            DetailsActivityFragment fragment = new DetailsActivityFragment();
             fragment.setArguments(arguments);
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.fragment_popularMovies_detail, fragment, DETAILS_TAG)
