@@ -139,8 +139,6 @@ public class DetailsActivityFragment extends Fragment {
                             values.put(MoviesProvider._ID, movieDetails.getId());
                             Uri uri = getActivity().getContentResolver().insert(
                                     MoviesProvider.CONTENT_URI, values);
-                            Toast.makeText(getActivity().getBaseContext(),
-                                    uri.toString(), Toast.LENGTH_LONG).show();
                             unchecked(movieId);
                         }
                     });
