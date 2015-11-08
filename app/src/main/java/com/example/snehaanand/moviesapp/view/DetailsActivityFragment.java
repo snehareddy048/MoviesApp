@@ -46,9 +46,11 @@ public class DetailsActivityFragment extends Fragment {
     ArrayList<String> content=new ArrayList<>();
     ArrayList<String> trailerName=new ArrayList<>();
     MovieClass movieDetails;
-    public final String TRAILERS_KEY="trailers";
-    public final String REVIEWS_KEY="reviews";
-    public final String MOVIE_DETAILS_KEY="movie_details";
+    static final String TRAILERS_KEY="trailers";
+    static final String REVIEWS_KEY="reviews";
+    static final String MOVIE_DETAILS_KEY="movie_details";
+    Button favorite;
+    static final String FAVORITE_TEXT="Favorite";
 
     @Nullable
     @Override
@@ -66,7 +68,7 @@ public class DetailsActivityFragment extends Fragment {
         ImageView movieImage = (ImageView) getActivity().findViewById(R.id.movieImage);
         ListView userReviews = (ListView) getActivity().findViewById(R.id.userReviews);
         ListView trailerVideos = (ListView) getActivity().findViewById(R.id.trailerVideos);
-        final Button favorite = (Button) getActivity().findViewById(R.id.favorite);
+        favorite = (Button) getActivity().findViewById(R.id.favorite);
 
         Bundle arguments = getArguments();
         if(savedInstanceState!=null)
@@ -123,22 +125,23 @@ public class DetailsActivityFragment extends Fragment {
                 releaseDate.setText(movieDetails.getRelease_date());
                 synopsis.setText(movieDetails.getOverview());
                 movieImage.setImageBitmap(movieDetails.getDisplay_image());
-                Boolean buttonVisibility = arguments.getBoolean(Utils.FAVORITE_MOVIE_ID, false);
-                if (buttonVisibility) {
-                    favorite.setClickable(false);
-                    favorite.getBackground().setColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY);
+                Boolean favoriteMovie = arguments.getBoolean(Utils.FAVORITE_MOVIE_ID, false);
+                final String movieId=movieDetails.getId().toString();
+                if (favoriteMovie) {
+                    favorite.setText(FAVORITE_TEXT);
+                    unchecked(movieId);
                 } else {
                     favorite.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            favorite.setClickable(false);
-                            favorite.getBackground().setColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY);
+                            favorite.setText(FAVORITE_TEXT);
                             ContentValues values = new ContentValues();
                             values.put(MoviesProvider._ID, movieDetails.getId());
                             Uri uri = getActivity().getContentResolver().insert(
                                     MoviesProvider.CONTENT_URI, values);
                             Toast.makeText(getActivity().getBaseContext(),
                                     uri.toString(), Toast.LENGTH_LONG).show();
+                            unchecked(movieId);
                         }
                     });
                 }
@@ -185,6 +188,18 @@ public class DetailsActivityFragment extends Fragment {
 
                 userReviews.setAdapter(reviewAdapter);
             }
+    }
+
+    public void unchecked(final String movieId)
+    {
+        favorite.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                favorite.setText(getResources().getString(R.string.mark_favorite));
+                getActivity().getContentResolver().delete(
+                        MoviesProvider.CONTENT_URI, MoviesProvider._ID+"=?", new String[]{movieId});
+            }
+        });
     }
 
     @Override

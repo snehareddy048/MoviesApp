@@ -151,13 +151,12 @@ public class MainActivityFragment extends Fragment {
             public void onItemClick(AdapterView<?> parent, View v,
                                     int position, long id) {
                 MovieClass movieClass = movieDetails.get(position);
-                String[] selectionArgs = {""};
-                selectionArgs[0] = movieClass.getId().toString();
-//                Cursor cursor = getActivity().getContentResolver().query(movies, null, MoviesProvider._ID, selectionArgs, MoviesProvider._ID);
+                Cursor cursor = getActivity().getContentResolver().query(movies, null, MoviesProvider._ID+"=?", new String[]{movieClass.getId().toString()}, MoviesProvider._ID);
                 boolean favoriteSetting=false;
-//                if(cursor!=null){
-//                    favoriteSetting=true;
-//                }
+                cursor.moveToFirst();
+                if(cursor!=null&cursor.getCount()>0){
+                    favoriteSetting=true;
+                }
                 PaneSelection paneSelection = (MainActivityFragment.PaneSelection) getActivity();
                 paneSelection.onItemSelection(movieClass, favoriteSetting);
             }
