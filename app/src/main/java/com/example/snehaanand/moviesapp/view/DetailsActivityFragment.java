@@ -185,7 +185,6 @@ public class DetailsActivityFragment extends Fragment {
 
                 userReviews.setAdapter(reviewAdapter);
             }
-
     }
 
     @Override

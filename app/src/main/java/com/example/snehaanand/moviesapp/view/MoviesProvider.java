@@ -108,16 +108,16 @@ public class MoviesProvider  extends ContentProvider {
 
     @Override
     public Cursor query(Uri uri, String[] projection, String selection,String[] selectionArgs, String sortOrder) {
-        SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
-        qb.setTables(MOVIES_TABLE_NAME);
+        SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
+        queryBuilder.setTables(MOVIES_TABLE_NAME);
 
         switch (uriMatcher.match(uri)) {
             case MOVIES:
-                qb.setProjectionMap(MOVIES_PROJECTION_MAP);
+                queryBuilder.setProjectionMap(MOVIES_PROJECTION_MAP);
                 break;
 
             case MOVIE_ID:
-                qb.appendWhere( _ID + "=" + uri.getPathSegments().get(1));
+                queryBuilder.appendWhere(_ID + "=" + uri.getPathSegments().get(1));
                 break;
 
             default:
@@ -130,7 +130,7 @@ public class MoviesProvider  extends ContentProvider {
              */
             sortOrder = _ID;
         }
-        Cursor c = qb.query(db,	projection,	selection, selectionArgs,null, null, sortOrder);
+        Cursor c = queryBuilder.query(db,	projection,	selection, selectionArgs,null, null, sortOrder);
 
         /**
          * register to watch a content URI for changes
@@ -173,7 +173,7 @@ public class MoviesProvider  extends ContentProvider {
 
             case MOVIE_ID:
                 count = db.update(MOVIES_TABLE_NAME, values, _ID + " = " + uri.getPathSegments().get(1) +
-                        (!TextUtils.isEmpty(selection) ? " AND (" +selection + ')' : ""), selectionArgs);
+                        (!TextUtils.isEmpty(selection) ? " AND (" + selection + ')' : ""), selectionArgs);
                 break;
 
             default:

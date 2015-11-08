@@ -37,12 +37,13 @@ import java.util.concurrent.ExecutionException;
 /**
  * Created by snehaanandyeluguri on 10/31/15.
  */
-public class MainActivityFragment extends Fragment{
+public class MainActivityFragment extends Fragment {
     ArrayList<MovieClass> movieDetails = new ArrayList<>();
-    ArrayList<Integer> movieIds=new ArrayList<>();
+    ArrayList<Integer> movieIds = new ArrayList<>();
     GridView gridview;
-    public final String FAVORITE_MOVIES="favorite_movies";
-    public final String MOVIE_KEY="movie_list_key";
+    public final String FAVORITE_MOVIES = "favorite_movies";
+    public final String MOVIE_KEY = "movie_list_key";
+    Uri movies;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -50,6 +51,7 @@ public class MainActivityFragment extends Fragment{
 
         return inflater.inflate(R.layout.fragment_main, container, false);
     }
+
     private class GetImageTask extends AsyncTask<JsonArray, Void, List> {
         @Override
         protected List<MovieClass> doInBackground(JsonArray... jsonArray) {
@@ -76,8 +78,9 @@ public class MainActivityFragment extends Fragment{
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        ImageAdapter imageAdapter=new ImageAdapter(getActivity(),movieDetails);
-
+        ImageAdapter imageAdapter = new ImageAdapter(getActivity(), movieDetails);
+        String URL = "content://" + Utils.CONTENT_BASE_URL + "/" + Utils.MOVIES_TEXT;
+        movies = Uri.parse(URL);
 
         gridview = (GridView) getActivity().findViewById(R.id.gridView);
         SharedPreferences sharedPrefs =
@@ -85,31 +88,26 @@ public class MainActivityFragment extends Fragment{
         String sortType = sharedPrefs.getString(
                 getString(R.string.pref_sort_key), "popularity");
 
-        //favorite
-        String URL = "content://"+ Utils.CONTENT_BASE_URL+"/"+Utils.MOVIES_TEXT;
-
-        Uri movies = Uri.parse(URL);
-        Cursor c = getActivity().managedQuery(movies, null, null, null, MoviesProvider._ID);
-
-        if (c!=null&&c.moveToFirst()) {
-            do{
-                Integer movieId=c.getInt(c.getColumnIndex(MoviesProvider._ID));
-                movieIds.add(movieId);
-            } while (c.moveToNext());
-        }
         gridview.setAdapter(imageAdapter);
         if (savedInstanceState != null) {
             movieIds = savedInstanceState.getIntegerArrayList(FAVORITE_MOVIES);
-            movieDetails = (ArrayList<MovieClass>)savedInstanceState.get(MOVIE_KEY);
+            movieDetails = (ArrayList<MovieClass>) savedInstanceState.get(MOVIE_KEY);
             imageAdapter.setGridData(movieDetails);
-        }
-
-       else  if(!isNetworkAvailable()){
+        } else if (!isNetworkAvailable()) {
             Toast.makeText(getActivity().getBaseContext(), R.string.no_internet, Toast.LENGTH_LONG).show();
-        }
-        else if(sortType.equalsIgnoreCase("favorite"))
-        {
-            for(Integer movieId:movieIds) {
+        } else if (sortType.equalsIgnoreCase("favorite")) {
+
+
+            Cursor c = getActivity().getContentResolver().query(movies, null, null, null, MoviesProvider._ID);
+
+            if (c != null && c.moveToFirst()) {
+                do {
+                    Integer movieId = c.getInt(c.getColumnIndex(MoviesProvider._ID));
+                    movieIds.add(movieId);
+                } while (c.moveToNext());
+            }
+
+            for (Integer movieId : movieIds) {
                 Uri builtUri = Uri.parse(Utils.MOVIEDB_BASE_URL).buildUpon().
                         appendPath(Utils.PATH_MOVIE).appendPath(movieId.toString())
                         .appendQueryParameter(Utils.QUERY_PARAMETER_API, Utils.API_KEY).build();
@@ -120,7 +118,7 @@ public class MainActivityFragment extends Fragment{
                     JsonObject jsonObject = new DownloadWebPageTask().execute(MOVIE_DB_URL).get();
                     movieJsonArray.add(jsonObject);
                     movieDetails = (ArrayList<MovieClass>) new GetImageTask().execute(movieJsonArray).get();
-                    if(movieDetails!=null) {
+                    if (movieDetails != null) {
                         imageAdapter.setGridData(movieDetails);
                     }
                 } catch (InterruptedException e) {
@@ -129,9 +127,7 @@ public class MainActivityFragment extends Fragment{
                     e.printStackTrace();
                 }
             }
-        }
-        else
-        {
+        } else {
             Uri builtUri = Uri.parse(Utils.MOVIEDB_BASE_URL).buildUpon().appendPath("discover").
                     appendPath(Utils.PATH_MOVIE).appendQueryParameter("sort_by", sortType + ".desc")
                     .appendQueryParameter(Utils.QUERY_PARAMETER_API, Utils.API_KEY).build();
@@ -141,10 +137,10 @@ public class MainActivityFragment extends Fragment{
                 JsonObject jsonObject = new DownloadWebPageTask().execute(MOVIE_DB_URL).get();
                 JsonArray jsonArray = jsonObject.getAsJsonArray(Utils.RESULTS);
                 movieDetails = (ArrayList<MovieClass>) new GetImageTask().execute(jsonArray).get();
-                if(movieDetails!=null) {
+                if (movieDetails != null) {
                     imageAdapter.setGridData(movieDetails);
                 }
-                } catch (InterruptedException e) {
+            } catch (InterruptedException e) {
                 e.printStackTrace();
             } catch (ExecutionException e) {
                 e.printStackTrace();
@@ -155,9 +151,15 @@ public class MainActivityFragment extends Fragment{
             public void onItemClick(AdapterView<?> parent, View v,
                                     int position, long id) {
                 MovieClass movieClass = movieDetails.get(position);
-                Boolean favoriteSetting = movieIds.contains(movieClass.getId());
-                PaneSelection paneSelection =(MainActivityFragment.PaneSelection)getActivity();
-                paneSelection.onItemSelection(movieClass,favoriteSetting);
+                String[] selectionArgs = {""};
+                selectionArgs[0] = movieClass.getId().toString();
+//                Cursor cursor = getActivity().getContentResolver().query(movies, null, MoviesProvider._ID, selectionArgs, MoviesProvider._ID);
+                boolean favoriteSetting=false;
+//                if(cursor!=null){
+//                    favoriteSetting=true;
+//                }
+                PaneSelection paneSelection = (MainActivityFragment.PaneSelection) getActivity();
+                paneSelection.onItemSelection(movieClass, favoriteSetting);
             }
         });
     }
@@ -169,14 +171,12 @@ public class MainActivityFragment extends Fragment{
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
-    public interface PaneSelection
-    {
-        void onItemSelection(MovieClass movieClass,Boolean favoriteSetting );
+    public interface PaneSelection {
+        void onItemSelection(MovieClass movieClass, Boolean favoriteSetting);
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState)
-    {
+    public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putIntegerArrayList(FAVORITE_MOVIES, movieIds);
         outState.putParcelableArrayList(MOVIE_KEY, movieDetails);
