@@ -1,6 +1,0 @@
-<resources>
-
-    <string name="no_internet_api">No internet connection or invalid API Key</string>
-    <string name="invalid_api">Invalid URL</string>
-
-</resources>

@@ -15,12 +15,12 @@ import java.net.URL;
 /**
  * Created by snehaanandyeluguri on 10/18/15.
  */
-public class DownloadWebPageTask extends android.os.AsyncTask<String, Void, JsonArray> {
-    public static final String RESULTS = "results";
+public class DownloadWebPageTask extends android.os.AsyncTask<String, Void, JsonObject> {
+
     public static final String URL_GET = "GET";
 
         @Override
-        protected JsonArray doInBackground(String... urls) {
+        protected JsonObject doInBackground(String... urls) {
             try {
                 return downloadUrl(urls[0]);
             } catch (IOException e) {
@@ -29,7 +29,7 @@ public class DownloadWebPageTask extends android.os.AsyncTask<String, Void, Json
             return null;
         }
 
-        private JsonArray downloadUrl(String myurl) throws IOException {
+        private JsonObject downloadUrl(String myurl) throws IOException {
             InputStream is = null;
 
             try {
@@ -61,11 +61,10 @@ public class DownloadWebPageTask extends android.os.AsyncTask<String, Void, Json
             }
         }
 
-        private JsonArray parseResult(String jsonElements) {
+        private JsonObject parseResult(String jsonElements) {
             JsonElement jsonElement = new JsonParser().parse(jsonElements);
             JsonObject jsonObject = jsonElement.getAsJsonObject();
-            JsonArray jsonArray = jsonObject.getAsJsonArray(RESULTS);
-            return jsonArray;
+            return jsonObject;
         }
 
 }
