@@ -7,6 +7,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 
 import com.example.snehaanand.moviesapp.model.MovieClass;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,7 +51,8 @@ public class ImageAdapter extends BaseAdapter {
         } else {
             imageView = (ImageView) convertView;
         }
-        imageView.setImageBitmap(thumbIds.get(position).getDisplay_image());
+        Picasso.with(context).load(thumbIds.get(position).getDisplay_image()).into(imageView);
+//        imageView.setImageBitmap(thumbIds.get(position).getDisplay_image());
         return imageView;
     }
 

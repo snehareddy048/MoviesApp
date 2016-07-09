@@ -30,6 +30,7 @@ import com.example.snehaanand.moviesapp.view.adapter.TrailerAdapter;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
@@ -124,7 +125,8 @@ public class DetailsActivityFragment extends Fragment {
                 userRating.setText(movieDetails.getVote_average().toString());
                 releaseDate.setText(movieDetails.getRelease_date());
                 synopsis.setText(movieDetails.getOverview());
-                movieImage.setImageBitmap(movieDetails.getDisplay_image());
+                Picasso.with(getActivity()).load(movieDetails.getDisplay_image()).into(movieImage);
+//                movieImage.setImageBitmap(movieDetails.getDisplay_image());
                 Boolean favoriteMovie = arguments.getBoolean(Utils.FAVORITE_MOVIE_ID, false);
                 final String movieId=movieDetails.getId().toString();
                 if (favoriteMovie) {
@@ -137,7 +139,7 @@ public class DetailsActivityFragment extends Fragment {
                             favorite.setText(FAVORITE_TEXT);
                             ContentValues values = new ContentValues();
                             values.put(MoviesProvider._ID, movieDetails.getId());
-                            Uri uri = getActivity().getContentResolver().insert(
+                            getActivity().getContentResolver().insert(
                                     MoviesProvider.CONTENT_URI, values);
                             unchecked(movieId);
                         }

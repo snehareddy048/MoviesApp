@@ -22,7 +22,7 @@ public class MovieClass implements Parcelable {
     private Float vote_average;
 
     //bitmap to be displayed
-    private Bitmap display_image;
+    private String display_image;
 
     public Integer getId() {
         return id;
@@ -72,11 +72,11 @@ public class MovieClass implements Parcelable {
         this.vote_average = vote_average;
     }
 
-    public Bitmap getDisplay_image() {
+    public String getDisplay_image() {
         return display_image;
     }
 
-    public void setDisplay_image(Bitmap display_image) {
+    public void setDisplay_image(String display_image) {
         this.display_image = display_image;
     }
 
@@ -93,7 +93,7 @@ public class MovieClass implements Parcelable {
         overview = in.readString();
         release_date = in.readString();
         vote_average = in.readFloat();
-        display_image = in.readParcelable(Bitmap.class.getClassLoader());
+        display_image = in.readString();
     }
 
     @Override
@@ -104,7 +104,7 @@ public class MovieClass implements Parcelable {
         dest.writeString(overview);
         dest.writeString(release_date);
         dest.writeFloat(vote_average);
-        dest.writeParcelable(display_image, flags);
+        dest.writeString(display_image);
     }
 
     public static final Parcelable.Creator<MovieClass> CREATOR

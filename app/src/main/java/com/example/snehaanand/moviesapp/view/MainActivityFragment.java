@@ -61,15 +61,8 @@ public class MainActivityFragment extends Fragment {
         private List<MovieClass> parseResult(JsonArray jsonArray) {
             for (int i = 0; i < jsonArray.size(); i++) {
                 MovieClass data = new Gson().fromJson(jsonArray.get(i), MovieClass.class);
-                try {
-                    URL url = new URL("http://image.tmdb.org/t/p/w185/" + data.getPoster_path());
-                    data.setDisplay_image(BitmapFactory.decodeStream(url.openConnection().getInputStream()));
+                    data.setDisplay_image("http://image.tmdb.org/t/p/w185/" + data.getPoster_path());
                     movieDetails.add(data);
-                } catch (MalformedURLException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
             }
             return movieDetails;
         }
@@ -178,6 +171,6 @@ public class MainActivityFragment extends Fragment {
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putIntegerArrayList(FAVORITE_MOVIES, movieIds);
-        outState.putParcelableArrayList(MOVIE_KEY, movieDetails);
+        outState.putSerializable(MOVIE_KEY, movieDetails);
     }
 }
